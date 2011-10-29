@@ -1,0 +1,45 @@
+--- -   2010-10-14 14:18:49.604756000 +0200
++++ script.sh   2010-10-14 14:18:21.434596857 +0200
+@@ -3,7 +3,7 @@
+ dircount=0
+ nondir=0
+ 
+-if [[ $1 == -h ]] ; then                    #
++if [[ $1 =~ ^--?h(elp)?$ ]] ; then
+     cat<<EOF
+ Usage: $0 dirs
+ Counts how many shell scripts there are in the given directories, how
+@@ -13,11 +13,11 @@
+     exit
+ fi
+ 
+-for dir in "$@"; do                          #
++for dir ; do
+ 
+     if [[ -d $dir ]] ; then
+-        count=$(ls "$dir"/*.sh | wc -l)      #
+-        if (( count > 0 )) ; then            #
++        count=$(ls "$dir"/*.sh 2>/dev/null | wc -l)
++        if (( count )) ; then
+           shdirs+=("$dir")
+           let filecount+=count
+         fi
+@@ -28,15 +28,15 @@
+ 
+ done
+ 
+-if (( filecount > 0 )) ; then                #
++if (( filecount )) ; then
+     echo Sh-files: $filecount
+ fi
+ 
+-if (( ${#shdirs[@]} > 0 )) ; then             #
++if (( ${#shdirs[@]} )) ; then
+     echo Sh-dirs: "${shdirs[@]}"
+ fi
+ 
+ if (( $# != $nondir )) ; then
+     echo -n "$filecount/($#-$nondir)="
+-    echo "$filecount/($#-$nondir)" | bc -l   #
++    bc -l <<< "$filecount/($#-$nondir)"
+ fi

@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+
+<project name="EvA_KarelBilek" default="dist" basedir=".">
+	<description>Projekt na úkoly na předmět Evoluční Algoritmy.</description>
+	<property name="srcdir" location="src"/>
+	<property name="distdir" location="dist"/>
+	<property name="builddir" location="build"/>
+	<property name="libdir" location="knihovna"/>
+	<property name="vysdir" location="vysledky"/>
+
+	<target name="init" description="vytvoří adresář na build">
+		<mkdir dir="${builddir}"/>
+		<tstamp/>
+	</target>
+
+	<path id="runclasspath">
+		<fileset dir="${libdir}">
+			<include name="**/*.jar"/>
+			<include name="**/lib/*.jar"/>
+		</fileset>
+		<pathelement path="${builddir}"/>	
+	</path>
+
+	<target name="compile" depends="init" description="zkompiluje vše">
+		<javac srcdir="${srcdir}" destdir="${builddir}" includeantruntime="false">
+			<classpath>
+				<fileset dir="${libdir}">
+					<include name="**/*.jar"/>
+					<include name="**/lib/*.jar"/>
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="cv1_1">
+		<java classname="eva2010.cv1.BitGA" classpathref="runclasspath"/>
+		<delete dir="${vysdir}/cv1"/>
+		<mkdir dir="${vysdir}/cv1"/>
+		<move todir="${vysdir}/cv1">
+			<fileset dir=".">
+				<include name="**/*.log*"/>
+			</fileset>
+		</move>
+		<exec command='bash skripty/cv1/cv1.sh'/>
+	</target>
+
+	<target name="cv1_2">
+		<exec command="perl skripty/cv1/prepis.pl"/> 
+	</target>
+
+	<target name="cv2_0">
+		<java classname="eva2010.cv2.Hromadky" classpathref="runclasspath"/>
+	</target>	
+</project>

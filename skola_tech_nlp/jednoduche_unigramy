@@ -1,0 +1,1 @@
+cat skakalpes-utf8.txt | sed 's/[ [:punct:]]/\n/g' | grep -v '^$'| sort | uniq -c | sort -n

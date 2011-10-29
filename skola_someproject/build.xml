@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<project name="hello world" default="dist" basedir=".">
+	<description>První HelloWorld pokus</description>
+	<property name="srcdir" location="src"/>
+	<property name="distdir" location="dist"/>
+	<property name="builddir" location="build"/>
+
+
+	<target name="init">
+		<mkdir dir="${builddir}"/>
+	</target>
+
+	<target name="compile">
+		<javac srcdir="${srcdir}" destdir="${builddir}">
+	</target>
+
+	<target name="build" >
+
+		<javac srcdir="src" destdir="build/src" debug="true" includes="**/*.java" />
+
+	</target>
+
+</project>
