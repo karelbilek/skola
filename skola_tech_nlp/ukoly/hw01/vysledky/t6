@@ -1,0 +1,2 @@
+cat skakalpes-utf8.txt | wc -l | cut -f1 -d' '
+1509
