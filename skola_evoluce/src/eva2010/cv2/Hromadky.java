@@ -40,6 +40,8 @@ public class Hromadky {
 	static String progFile;
 	static String bestPrefix;
 
+	static int 
+
 	public static void main(String[] args) {
 
 		Properties prop = new Properties();
