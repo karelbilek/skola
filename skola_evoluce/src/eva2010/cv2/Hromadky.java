@@ -1,5 +1,6 @@
 package eva2010.cv2;
 
+import java.io.File;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -22,6 +23,7 @@ import org.jgap.impl.DefaultConfiguration;
 import org.jgap.impl.IntegerGene;
 import org.jgap.impl.StandardPostSelector;
 import org.jgap.impl.*;
+import org.jgap.*;
 import eva2010.StatsLogger;
 
 public class Hromadky {
@@ -40,7 +42,14 @@ public class Hromadky {
 	static String progFile;
 	static String bestPrefix;
 
-	static int 
+	public interface ReturnSelectorFromConf {
+		public NaturalSelector which(Configuration wat) throws InvalidConfigurationException;
+	}
+
+	static ReturnSelectorFromConf firstSelector;
+	static ReturnSelectorFromConf secondSelector;
+
+//	static int 
 
 	public static void main(String[] args) {
 
@@ -63,10 +72,90 @@ public class Hromadky {
 		repeats = Integer.parseInt(prop.getProperty("repeats", "10"));
 		
 		String inputFile = prop.getProperty("input_file");
-		
+	
+		int firstSelType = Integer.parseInt(prop.getProperty("first_selector_type"));
+		String firstSelConf = prop.getProperty("first_more");
+
+		if (firstSelType == 1) {
+			firstSelector = new ReturnSelectorFromConf(){
+				@Override
+				public NaturalSelector which(Configuration wat)  throws InvalidConfigurationException{
+					return new WeightedRouletteSelector(wat);
+				}
+			};
+		} else if (firstSelType ==2) {
+			final String[] conf = firstSelConf.split("-");
+			final int tourSize = Integer.parseInt(conf[0]);
+			final double prob = Double.parseDouble(conf[1]);
+			firstSelector = new ReturnSelectorFromConf(){
+				@Override
+				public NaturalSelector which(Configuration wat)  throws InvalidConfigurationException{
+					return new TournamentSelector(wat, tourSize, prob);
+				}
+			};
+		} else if (firstSelType==3) {
+			final double prob = 1/Integer.parseInt(firstSelConf);
+			firstSelector = new ReturnSelectorFromConf(){
+				@Override
+				public NaturalSelector which(Configuration wat)  throws InvalidConfigurationException{
+					return new BestChromosomesSelector(wat, prob);
+				}
+			};
+		} else {
+			System.out.println("NOOOOOO");
+			System.exit(0);
+		}
+
+		int secondSelType = Integer.parseInt(prop.getProperty("second_selector_type"));
+		String secondSelConf = prop.getProperty("second_more");
+
+		if (secondSelType == 1) {
+			secondSelector = new ReturnSelectorFromConf(){
+				@Override
+				public NaturalSelector which(Configuration wat) throws InvalidConfigurationException {
+					return new WeightedRouletteSelector(wat);
+				}
+			};
+		} else if (secondSelType ==2) {
+			final String[] conf = secondSelConf.split("-");
+			final int tourSize = Integer.parseInt(conf[0]);
+			final double prob = Double.parseDouble(conf[1]);
+			secondSelector = new ReturnSelectorFromConf(){
+				@Override
+				public NaturalSelector which(Configuration wat)  throws InvalidConfigurationException{
+					return new TournamentSelector(wat, tourSize, prob);
+				}
+			};
+		} else if (secondSelType==3) {
+			final double prob = 1/Integer.parseInt(secondSelConf);
+			secondSelector = new ReturnSelectorFromConf(){
+				@Override
+				public NaturalSelector which(Configuration wat)  throws InvalidConfigurationException{
+					return new BestChromosomesSelector(wat, prob);
+				}
+			};
+		} else if (secondSelType==4) {
+			secondSelector = new ReturnSelectorFromConf(){
+				@Override
+				public NaturalSelector which(Configuration wat)  throws InvalidConfigurationException{
+					return new StandardPostSelector(wat);
+				}
+			};
+		}
+
+
+
 		weights = new Vector<Double>();
 		try {
-			BufferedReader in = new BufferedReader(new FileReader(inputFile));
+			File f = new File("dalsi_inputy/cv2/"+inputFile);
+			if (!f.exists()) {
+				System.out.println("Neexistuje!");
+				
+				System.exit(0);
+			} else {
+				System.out.println("EXISTUJE!");
+			}
+			BufferedReader in = new BufferedReader(new FileReader(f));
 			String line;
 			while ((line = in.readLine()) != null) {
 				weights.add(Double.parseDouble(line));
@@ -76,20 +165,19 @@ public class Hromadky {
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 		}
-
-		System.out.println("Neserazene");
-		for (Double f:weights) {
-			System.out.println(f);
-		}
 		
-		java.util.Collections.sort(weights);
-
-		System.out.println("serazene");
-		for (Double f:weights) {
-			System.out.println(f);
+		int sort = Integer.parseInt(prop.getProperty("sort"));
+		if (sort == 0) {
+			//nic
+		} else if (sort == 1) {		
+			java.util.Collections.sort(weights);
+		} else {
+			System.out.println("NOOOOOOO!");
+			System.exit(0);
 		}
-		
-//		System.exit(0);
+				
+		System.out.println("ALL OK");
+		System.exit(0);
 
 		for (int i = 0; i < repeats; i++) {
 			run(i);

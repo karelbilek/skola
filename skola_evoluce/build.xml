@@ -49,6 +49,6 @@
 	</target>
 
 	<target name="cv2_0">
-		<java classname="eva2010.cv2.Hromadky" classpathref="runclasspath"/>
+		<exec command="perl skripty/cv2/prepis.pl"/>
 	</target>	
 </project>
