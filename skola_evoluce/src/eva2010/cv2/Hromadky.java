@@ -57,6 +57,7 @@ public class Hromadky {
 		try {
 			InputStream propIn = new FileInputStream("ga-cv2.properties");
 			prop.load(propIn);
+			propIn.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -71,10 +72,19 @@ public class Hromadky {
 		resultsFile = prop.getProperty("results_filename", "ga.log");
 		repeats = Integer.parseInt(prop.getProperty("repeats", "10"));
 		
-		String inputFile = prop.getProperty("input_file");
-	
+		String inputFile = prop.getProperty("input_file" );
+	//	if (inputFile == null) {
+			System.out.println(prop);
+	//		System.exit(0);
+	//	}
+
+
 		int firstSelType = Integer.parseInt(prop.getProperty("first_selector_type"));
 		String firstSelConf = prop.getProperty("first_more");
+		if (inputFile == null || firstSelConf==null) {
+			System.out.println(prop);
+			System.exit(0);
+		}
 
 		if (firstSelType == 1) {
 			firstSelector = new ReturnSelectorFromConf(){
@@ -177,7 +187,7 @@ public class Hromadky {
 		}
 				
 		System.out.println("ALL OK");
-		System.exit(0);
+		//System.exit(0);
 
 		for (int i = 0; i < repeats; i++) {
 			run(i);

@@ -22,7 +22,7 @@
 	</path>
 
 	<target name="compile" depends="init" description="zkompiluje vše">
-		<javac srcdir="${srcdir}" destdir="${builddir}" includeantruntime="false">
+		<javac srcdir="${srcdir}" destdir="${builddir}" includeantruntime="false" debug="on" debuglevel="lines,vars,source">
 			<classpath>
 				<fileset dir="${libdir}">
 					<include name="**/*.jar"/>

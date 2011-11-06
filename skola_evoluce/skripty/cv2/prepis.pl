@@ -1,5 +1,5 @@
 #system("mv ga.properties ga.orig");
-for my $i (2,5,20) {
+ for my $i (2,5,20) {
 #ruleta turnament chromosome standard
 for my $fst (1,2,3 ){
 my @first_option;
@@ -15,7 +15,7 @@ if ($snd==2) {for my $f (2,5,10) {for my $s (2,5,20) {my $ff=int($i*10/$f); my $
 if ($snd==3) {@second_option=(1,5,20);}
 if ($snd==4) {@second_option=(1);}
 for my $snd_opt(@second_option){
-for my $max_gen(2,5,20){
+for my $max_gen(20){
 for my $sort(0,1){
 for my $preserve(0,1){
 
@@ -38,7 +38,7 @@ for my $preserve(0,1){
 	first_selector_type = FST
 	first_more = FMR
 	second_selector_type = SND
-	second_selector_type_more = SMR
+	second_more = SMR
 	sort = SRT
 	preserve = PRS
 
@@ -71,7 +71,6 @@ EOF
 
 	system("java -cp './knihovna/jgap.jar:./knihovna/lib/*:./build/' eva2010.cv2.Hromadky");
 
-	die "ALL OK";
 
 	system("rm -f stat.log.*");
 	system("rm -f prog.log.*");
@@ -79,14 +78,13 @@ EOF
 	system("rm -f best");
 
 	if (defined $s) {$s.=","}
-	$s .= $name.' using 2 w l';
-
+	$s .= '"'.$name.'" using 2 w l';
 }}}}}}}}
 
-system("csdgnuplot -e '
+system("gnuplot -e '
 set terminal png;
 set output \"graf.png\";
 plot $s'");
 
-#system("mkdir vysledky/cv2; mv graf.png vysledky/cv2; mv progress_* vysledky/cv2");
+system("mkdir vysledky/cv2; mv graf.png vysledky/cv2; mv prog* vysledky/cv2");
 #system("mv ga.orig ga.properties");
