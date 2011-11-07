@@ -48,6 +48,11 @@
 		<exec command="perl skripty/cv1/prepis.pl"/> 
 	</target>
 
+	<target name="cv2_best">
+		<exec command="perl skripty/cv2/nejlepsi.pl"/>
+
+	</target>
+
 	<target name="cv2_0">
 		<exec command="perl skripty/cv2/prepis.pl"/>
 	</target>	
