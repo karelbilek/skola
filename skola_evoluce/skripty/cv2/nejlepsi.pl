@@ -1,14 +1,14 @@
 #system("mv ga.properties ga.orig");
  for my $i (200) {
 #ruleta turnament chromosome standard
-for my $fst (2 ){
+for my $fst (3 ){
 my @first_option;
 if ($fst==1) {@first_option=(1)}
 if ($fst==2) {for my $f (1, 2) {for my $s (20) {my $ff=int($i*10/$f); my $ss=1/$s; push @first_option, $ff."-".$ss}}}
-if ($fst==3) {@first_option=(1,5,20);}
+if ($fst==3) {@first_option=(1);}
 if ($fst==4) {@first_option=(1);}
 for my $fst_opt (@first_option){
-for my $snd (2 ){
+for my $snd (4 ){
 my @second_option;
 if ($snd==1) {@second_option=(1)}
 if ($snd==2) {for my $f (5) {for my $s (20) {my $ff=int($i*10/$f); my $ss=1/$s; push @second_option, $ff."-".$ss}}}
@@ -30,7 +30,7 @@ for my $preserve(1){
 	max_generations = MGN
 
 	#kolikrat se ma experiment opakovat
-	repeats = 2
+	repeats = 10
 	#prefix jmena souboru jednotlivych experimentu
 	log_filename_prefix = stat.log
 	#jmeno souboru s konecnymi vysledky (minima, maxima a prumery jednotlivych experimentu)

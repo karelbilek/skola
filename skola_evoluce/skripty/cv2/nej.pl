@@ -53,12 +53,12 @@ sub otherpartsub {
 		}
 	}, sub {
 		use 5.010;
-		say "$wat.------------";
-		for (sort {$sums{$a}<=>$sums{$b}} keys %sums) {
+		say "$wat\n<table>";
+		for (sort {($sums{$a}/$sizes{$a})<=>($sums{$b}/$sizes{$b})} keys %sums) {
 			use 5.010;
-			say $_." --- ".$sums{$_}/$sizes{$_};
+			say "<tr><td>".$_."</td><td>".($sums{$_}/$sizes{$_})."</td></tr>";
 		}
-
+		say"</table>";
 	});
 
 }
@@ -69,11 +69,11 @@ sub otherpartsub {
 
 forall(partsub(1));
 forall(partsub(2));
-forall(otherpartsub("3_2_prvni", sub{if ($_[2]!="2") {return undef;} my @k=split(/-/, $_[3]); return $k[0];}));
+forall(otherpartsub("3_2_prvni", sub{if ($_[2]!="2") {return undef;} my @k=split(/-/, $_[3]); return ($k[0]/($_[1]));}));
 forall(otherpartsub("3_2_druhy", sub{if ($_[2]!="2") {return undef;} my @k=split(/-/, $_[3]); return $k[1];}));
 forall(otherpartsub("3_3",  sub{if ($_[2]!="3") {return undef;}  return $_[3];}));
 forall(partsub(4));
-forall(otherpartsub("5_2_prvni", sub{if ($_[4]!="2") {return undef;} my @k=split(/-/, $_[5]); return $k[0];}));
+forall(otherpartsub("5_2_prvni", sub{if ($_[4]!="2") {return undef;} my @k=split(/-/, $_[5]); return ($k[0]/($_[1]));}));
 forall(otherpartsub("5_2_druhy", sub{if ($_[4]!="2") {return undef;} my @k=split(/-/, $_[5]); return $k[1];}));
 forall(otherpartsub("5_3",  sub{if ($_[4]!="3") {return undef;}  return $_[5];}));
 forall(partsub(6));

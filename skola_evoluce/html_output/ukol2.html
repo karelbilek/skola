@@ -1,0 +1,119 @@
+Měl jsem pocit, že ať se snažím, jak se snažím, tak to kolísá kolem tisícovky. Tak jsem se naštval a udělal to trochu jinak.
+<br><br>
+"Natvrdo" jsem napsal skript, co zkusí asi 2000 různých kombinací se stejným počtem generací, co ale zkouší různé první selektory, a všechno jsem to vynesl do grafu. (Jestli se skutečně do grafu zaneslo všech 2000 progressů nevim, snad ano)
+<br><br>
+<img src="graf_cv2.png">
+<br><br>
+Co se měnilo byla:<br>
+<ul><li>
+populace 20, 50, 200</li>
+<li>první selektor - ruleta, turnaj, chromosome selector</li>
+<li>vlastnosti prvního selektoru
+<ul><li>u rulety nic</li>
+<li>u turnaje velikost (polovina, pětina a desetina populace) a pravděpodobnost (polovina, pětina, dvacetina)</li>
+<li>u chromosomu taky pravděpodobnost (jedna, pětina, dvacetina)</li>
+</ul></li>
+<li>druhý selector - ruleta, turnaj, chromosom, "standard output"<li>
+<li>vlastnosti druhého selektoru - stejně, jako předtim</li>
+<li>jestli se váhy kupiček budou řadit</li>
+<li>jestli se nastaví SetPreserveFittest...</li>
+</ul>
+<br><br>
+Vše se spustilo jenom dvakrát. Chtěl jsem ještě zkusit různé metriky, ale zapomněl jsem na to a už to dělat nebudu.<br><br>
+<br><br>
+Nejhorší byla varianta: populace 20, turnaj, velikost turnaje 4, pravděpodobnost 0.5, druhý selektor chromosome, řazeno, s setPreserveFittest, a dopadlo to rozdíl 1975. 
+<br><br>
+Nejlepší byla varianta: populace 200, turnaj, velikost turnaje 100, pravděpodobnost 0.05, druhý selektor turnaj, velikost 40, pravděpodobnost 0,05, řadí, bere fittest.
+<br><br>
+Je vidět, že u všech možností se rozdíl zasekne někde v půlce a už se nezlepší.
+<br><br>
+Pak jsem vzal jednotlivé veličiny, co jsem měnil, a vzal jsem průměr rozdílů v nejlepších jedincích s různými hodnotami dané veličiny - snad to píšu dost jasně, prostě jsem chtěl zjistit, jak různé možnosti zlepší nebo zhorší rozdíl.
+<br><br>
+U populace je nepřekvapivé, že větší znamená lepší výsledek.
+
+<table border="1">
+<tr><td>200</td><td>860.464285714286</td></tr>
+<tr><td>50</td><td>1104.55769230769</td></tr>
+<tr><td>20</td><td>1307.94505494505</td></tr>
+</table>
+<br><br>
+První selektor je nepatrně lepší chromosome.
+
+<table border="1">
+<tr><td>chromosome</td><td>1082.66865079365</td></tr>
+<tr><td>turnaj</td><td>1092.73346560847</td></tr>
+<tr><td>ruleta</td><td>1100.25</td></tr>
+</table>
+<br><br>
+U těch, co měli jako první turnaj, je o něco lepší menší turnaj.
+
+<table border="1">
+<tr><td>0.1</td><td>1089.39285714286</td></tr>
+<tr><td>0.2</td><td>1093.33928571429</td></tr>
+<tr><td>0.5</td><td>1095.46825396825</td></tr>
+</table>
+<br><br>
+... a menší pravděpodobnost.
+
+<table border="1">
+<tr><td>0.05</td><td>1083.69841269841</td></tr>
+<tr><td>0.5</td><td>1094.47619047619</td></tr>
+<tr><td>0.2</td><td>1100.02579365079</td></tr>
+</table>
+<br><br>
+U těch, co měli chromosome, je o něco lepší větší pravděpodobnost.
+
+<table border="1">
+<tr><td>1/1</td><td>1069.33333333333</td></tr>
+<tr><td>1/5</td><td>1079.60714285714</td></tr>
+<tr><td>1/20</td><td>1099.06547619048</td></tr>
+</table>
+<br><br>
+Jako druhý selector je nejlepší ten standardní.
+
+<table border="1">
+<tr><td>standardní</td><td>1047.37820512821</td></tr>
+<tr><td>chromosome</td><td>1089.00213675214</td></tr>
+<tr><td>ruleta</td><td>1095.88461538462</td></tr>
+<tr><td>turnaj</td><td>1095.95299145299</td></tr>
+</table>
+<br><br>
+Pokud bych bral jako druhý selektor turnaj, nejlepší je vzít velikost jednu pětinu.
+
+<table border="1">
+<tr><td>0.2</td><td>1082.73717948718</td></tr>
+<tr><td>0.5</td><td>1098.31623931624</td></tr>
+<tr><td>0.1</td><td>1106.80555555556</td></tr>
+</table>
+<br><br>
+A pravděpodobnost jednu polovinu.
+
+<table border="1">
+<tr><td>0.5</td><td>1092.90384615385</td></tr>
+<tr><td>0.2</td><td>1096.62179487179</td></tr>
+<tr><td>0.05</td><td>1098.33333333333</td></tr>
+</table>
+<br><br>
+Pokud bych bral chromosome, nejlepší je vzít pravděpodobnost jednu pětinu.
+
+<table border="1">
+<tr><td>1/5</td><td>1076.37820512821</td></tr>
+<tr><td>1/1</td><td>1085.33974358974</td></tr>
+<tr><td>1/20</td><td>1105.28846153846</td></tr>
+</table>
+<br><br>
+Lepší je řadit, než neřadit.
+
+<table border="1">
+<tr><td>1</td><td>1084.63003663004</td></tr>
+<tr><td>0</td><td>1097.34798534799</td></tr>
+</table>
+<br><br>
+Lepší je setPreserveFittest (elitismus) zapnout.
+
+<table border="1">
+<tr><td>1</td><td>1081.39010989011</td></tr>
+<tr><td>0</td><td>1100.58791208791</td></tr>
+</table>
+<br><br>
+Na základě výsledků jsem vzal větší populaci, více pokusů a nastavil ideální konfiguraci.
