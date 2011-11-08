@@ -53,16 +53,16 @@ public class HromadkyFitness extends FitnessFunction {
 			if (vahy[i] > max)
 				max = vahy[i];
 			dev += (vahy[i]-prumer)*(vahy[i]-prumer);
-			/*if (i!=K-1) {
+			if (i!=K-1) {
 				rozdil += vahy[i+1]/vahy[i];
-			}*/
+			}
 		}
 		dev = Math.sqrt(dev/K);
 		rozdil = rozdil / K;
 
 		aSubject.setApplicationData(new Double(max - min));
 	
-		//double pokus = 100000 - new Double(max-min);
+		//double pokus = 100000 - new Double(max-min);return pokus;
 		//return (10000-dev < 0) ? 0 : 10000-dev;
 		return 1/dev;
 	}

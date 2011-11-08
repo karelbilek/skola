@@ -15,7 +15,7 @@ if ($snd==2) {for my $f (5) {for my $s (20) {my $ff=int($i*10/$f); my $ss=1/$s; 
 if ($snd==3) {@second_option=(1,5,20);}
 if ($snd==4) {@second_option=(1);}
 for my $snd_opt(@second_option){
-for my $max_gen(30){
+for my $max_gen(70){
 for my $sort(1){
 for my $preserve(1){
 
@@ -30,7 +30,7 @@ for my $preserve(1){
 	max_generations = MGN
 
 	#kolikrat se ma experiment opakovat
-	repeats = 10
+	repeats = 40
 	#prefix jmena souboru jednotlivych experimentu
 	log_filename_prefix = stat.log
 	#jmeno souboru s konecnymi vysledky (minima, maxima a prumery jednotlivych experimentu)
@@ -58,7 +58,7 @@ EOF
 	$d=~s/SMR/$snd_opt/g;
 	$d=~s/SRT/$sort/g;
 	$d=~s/PRS/$preserve/g;
-	my $mgn = $max_gen*10;
+	my $mgn = $max_gen;
 	$d=~s/MGN/$mgn/g;
 
 	$d=~/(progress_.*\.log)/;
@@ -72,10 +72,10 @@ EOF
 	system("java -cp './knihovna/jgap.jar:./knihovna/lib/*:./build/' eva2010.cv2.Hromadky");
 
 
-	system("rm -f stat.log.*");
-	system("rm -f prog.log.*");
-	system("rm -f results.log");
-	system("rm -f best");
+	#system("rm -f stat.log.*");
+	#system("rm -f prog.log.*");
+	#system("rm -f results.log");
+	#system("rm -f best");
 
 	if (defined $s) {$s.=","}
 	$s .= '"'.$name.'" using 2 w l';
@@ -83,8 +83,8 @@ EOF
 
 system("gnuplot -e '
 set terminal png;
-set output \"graf2.png\";
+set output \"graf.png\";
 plot $s'");
 
-system("mkdir vysledky/cv2; mv graf2.png vysledky/cv2; mv prog* vysledky/cv2");
+system("mkdir vysledky/cv2_nej_2; mv graf.png vysledky/cv2_nej_2; mv prog* stat.log.* prog.log.* resuls.log best* vysledky/cv2_nej_2");
 #system("mv ga.orig ga.properties");
