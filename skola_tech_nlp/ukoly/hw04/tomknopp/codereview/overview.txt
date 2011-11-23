@@ -1,0 +1,11 @@
+The module is functionally correct, it finds the beginning or endings or the whole words in a sort of dictionary.
+
+The programming style is, however, inconsistent and a bit confusing, as are the names of the subroutines.
+
+Some parts look like copy-pasted from other sources. The function tagWord is unnecessarily exported.
+
+The POD is not working at all. It is describing the function correctly, but an example would be nice.
+
+The test is not a real test, but really only visual test, and not a good one, because the result is just a printed list of tags.
+
+The test (the original one and my new one) are not covering the whole functionality, meaning that most of the dictionary is not covered by examples. I personally think it is not necessary. 
