@@ -1,0 +1,11 @@
+<!ELEMENT corpus (token*)>
+<!ELEMENT token (form, lemma)>
+<!ELEMENT lemma (#PCDATA)>
+<!ELEMENT form (#PCDATA)>
+<!ATTLIST token pos (adjective|numeral|adverb|interjection|conjunction|noun|pronoun|verb|preposition|particle|unknown|punctuation) #REQUIRED
+                gender (feminine|feminine_or_neuter|masculine_inanimate|masculine_animate|neuter|masculine_inanimate_or_feminine|any|not_feminine) #IMPLIED
+                number (dual|plular|singular|any) #IMPLIED
+                case (nominative|genitive|dative|accusative|vocative|locative|instrumental|any) #IMPLIED
+                person (1|2|3|any) #IMPLIED>
+
+<!ATTLIST corpus language CDATA #REQUIRED>

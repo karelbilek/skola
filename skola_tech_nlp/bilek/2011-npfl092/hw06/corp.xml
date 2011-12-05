@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE corpus SYSTEM "corpus.dtd">
+<corpus language="czech">
+   <token pos="noun" gender="masculine_animate" number="singular" case="nominative">
+       <form>Fořt</form>
+       <lemma>fořt</lemma>
+   </token>
+   <token pos="noun" gender="masculine_animate" number="singular" case="nominative">
+       <form>Bořivoj</form>
+       <lemma>Bořivoj</lemma>
+   </token>
+   <token pos="verb" gender="masculine_animate" number="singular" person="3">
+       <form>byl</form>
+       <lemma>být</lemma>
+   </token>
+   <token pos="pronoun" case="nominative">
+       <form>co</form>
+       <lemma>co</lemma>
+   </token>
+   <token pos="preposition" case="genitive">
+       <form>do</form>
+       <lemma>do</lemma>
+   </token>
+   <token pos="noun" gender="feminine" number="singular" case="genitive">
+       <form>fazóny</form>
+       <lemma>fazóna</lemma>
+   </token>
+   <token pos="adjective" gender="masculine_inanimate" number="singular" case="nominative">
+       <form>pravý</form>
+       <lemma>pravý</lemma>
+   </token>
+   <token pos="noun" gender="masculine_inanimate" number="singular" case="nominative">
+       <form>opak</form>
+       <lemma>opak</lemma>
+   </token>
+   <token pos="adjective" gender="masculine_animate" number="singular" case="genitive">
+       <form>hajného</form>
+       <lemma>hajný</lemma>
+   </token>
+   <token pos="noun" gender="masculine_animate" number="singular" case="genitive">
+       <form>Vítězslava</form>
+       <lemma>Vítězslav</lemma>
+   </token>
+   <token pos="punctuation">
+       <form>.</form>
+       <lemma>.</lemma>
+   </token>
+</corpus>
