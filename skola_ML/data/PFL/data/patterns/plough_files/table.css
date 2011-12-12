@@ -1,0 +1,85 @@
+/* The specific style rules used to suggest rendering */
+/* for the CSS table design example, starts here */
+
+DIV.base-layer {
+  /*background: none #cc9966;*/ /*border: solid #333333 1px;*/ color: #000000;
+  /*margin: 0.5em 12px 0.5em 12px;*/ padding: 0; text-align: center; width: auto;
+}
+
+DIV.table-row {
+  /*background: none #ffffcc;*/ /*border: solid #000000 1px;*/ color: #000000;
+  margin-top: 0; margin-right: auto; margin-bottom: 0; margin-left: auto;
+  padding: 0; /*text-align: center; width: 96%;*/
+}
+
+/* Watch out for this DIV... rule, it appears every now and then */
+
+DIV.space-line {
+  clear: both; margin: 0; padding: 0; width: auto;
+}
+
+/* Some rules for captions, headers and running text */
+
+H4.table-caption {
+  background: transparent; color: #3333cc; font-family: sans-serif;
+  font-size: 1em; font-style: italic; font-weight: bold; margin: 0;
+  padding: 0.3em; text-align: center; width: auto;
+}
+
+H5.colhdr {
+  background: none #ffffcc; border: solid #3333cc 1px; color: #993333;
+  font-family: sans-serif; font-size: 1em; font-style: italic;
+  font-weight: normal; margin: 0; padding: 0.3em 0.3em 0 0.3em;
+  text-align: center; width: auto;
+}
+
+P.text {
+  /*border: solid #3333cc 1px;*/ margin: 0; padding: 0.3em 0.3em 0 0.3em;
+  font-style: normal; font-size: 1em; text-indent: 0;
+  width: auto;
+}
+
+ DIV.cell {
+  border: solid #000000 1px; float: left; margin: 0; padding: 0; 
+}
+DIV.cell-empty {
+  float: left; margin: 1px; padding: 0; 
+}
+
+/*public main*/
+DIV.cell-verb {
+  width: 20%;  text-align: left;
+}
+DIV.cell-number {
+  width: 8%;
+}
+DIV.cell-oec, DIV.cell-bnc {
+  width: 8%;
+}
+DIV.cell-created {
+  width: 27%;
+}
+DIV.cell-updated {
+  width: 27%;
+}
+
+/*public verb*/
+DIV.cell-patnum {
+  width: 2em;
+}
+DIV.cell-patperc {
+  width: 3em;
+}
+DIV.cell-link {
+  width: 4%;
+}
+DIV.cell-patstring, DIV.cell-implic {
+  width: 87%;
+  text-align: left;
+}
+span.idiom {
+  color: #0b0;
+}
+tr.bottom td {
+  border-bottom: solid black 2px;
+}
