@@ -16,9 +16,8 @@ Readonly my %type_for_line=> qw(
 
 sub for_every_line {
     my $name = shift;
-    my $sub = shift;
-    my $at_the_end = shift;
-    open my $inf, "<", "data/development.instances/$sloveso.txt";
+    my @subs = @_;
+    open my $inf, "<", "data/development.instances/$name.txt";
     my $i = 1;
     my %object;
     while (my $line = <$inf>) {
@@ -27,6 +26,9 @@ sub for_every_line {
         my $line_number = $i % 7;
         if ($line_number) {
             $object{$type_for_line{$line_number}} = $line;
+            if ($line_number == 2) {
+                $object{pattern}=~s/\..*$//;
+            }
             if ($line_number == 3) {
                 my @split = split (/ /, $line);
                 my $verb_nu;
@@ -43,12 +45,12 @@ sub for_every_line {
                 my @split = split(/\t/, $line);
                 my @words = map {
                     my ($form, $lemma, $POS) = split(/ /, $_);
-                    my $object = {
+                    my $object_morp = {
                         form=>$form,
                         lemma=>$lemma,
                         POS=>$POS
                     };
-                    $object;
+                    $object_morp;
                  } @split;
                 $object{morphology_split} = \@words;
             }
@@ -57,23 +59,25 @@ sub for_every_line {
                 my @words = map{
                     my ($type, $head, $head_nu, $this, $this_nu) = 
                         $_ =~ /(.*)\((.*)-(.*?)'?, (.*)-(.*?)'?\)/;
-                    my $object = {
+                    my $object_dep = {
                         type=>$type,
                         head_word=>$head,
                         head_number=>$head_nu-1,
                         this_word=>$this,
                         this_number=>$this_nu-1
                     };
-                    $object;
+                    $object_dep;
                 } @split;
                 $object{dependencies_split} = \@words;
             }
         } else {
-            my $res = $sub->(\%object);
-            if (!defined $res) {
-                die "Not defined at sentence number ".$object{id};
+            print $object{id}."\t";
+            print $object{pattern}."\t";
+            my @res = map {$_->(\%object)} @subs;
+            if (scalar@res != scalar @subs) {
+                die "Something fishy at sentence number ".$object{id};
             }
-            say $res;
+            say join "\t", @res;
             #say $object{dependencies};
             #say $object{verb_number};
             #say $object{sentence};
@@ -83,9 +87,6 @@ sub for_every_line {
         }
     } continue {
         $i++;
-    }
-    if (defined $at_the_end) {
-        $at_the_end->();
     }
 }
 
@@ -107,17 +108,20 @@ sub is_modality {
     my $regex = ($type == 1) ? 
         ('would|should') :
         ('can|could|may|must|ought|might');
-    return dependency_has('aux\('.$sloveso.'-\d+, ('.$regex.')');
+    return ["is_modality_$type", 
+        dependency_has('aux\('.$sloveso.'-\d+, ('.$regex.')')];
 }
 
 #FEATURE()
 sub is_passive {
-    return dependency_has('auxpass\('.$sloveso.'-'); 
+    return ["is_passive",
+        dependency_has('auxpass\('.$sloveso.'-')]; 
 }
 
 #FEATURE()
 sub is_negation {
-    return dependency_has('neg\('.$sloveso.'-');
+    return ["is_negation",
+        dependency_has('neg\('.$sloveso.'-')];
 }
 
 sub is_infinite_phrase {
@@ -145,7 +149,7 @@ sub check_morph_words_around {
 sub check_type {
     my @types = @_;
     my %types_hash; @types_hash{@_}=();
-    return sub{return exists $types_hash{$_->{POS}}};
+    return sub{return exists $types_hash{$_[0]->{POS}}};
 }
 
 sub check_type_of_words_around {
@@ -158,7 +162,8 @@ sub check_type_of_words_around {
 sub is_to_be_around {
     my $away = shift;
     my @types = @_;
-    return check_morph_words_around($away, sub{$_->{lemma} eq  "be"});
+    return ["is_to_be_around_$away",
+        check_morph_words_around($away, sub{$_[0]->{lemma} eq  "be"})];
 }
 
 
@@ -173,7 +178,8 @@ Readonly my %tense_types => qw (
 sub is_tense {
     my $tense_type_number=shift;
     my $type = $tense_types{$tense_type_number};
-    return check_type_of_words_around(0, $type);
+    return ["is_tense_$tense_type_number",
+        check_type_of_words_around(0, $type)];
 }
 
 Readonly my %POS_type_refs => (
@@ -191,7 +197,8 @@ sub is_POS_around{
     my $how_far_away = shift;
     my $POS_type_number = shift;
     my $type_ref = $POS_type_refs{$POS_type_number};
-    return check_type_of_words_around($how_far_away, @$type_ref);
+    return ["is_POS_around_$how_far_away"."_$POS_type_number",
+        check_type_of_words_around($how_far_away, @$type_ref)];
 }
 
 sub do_something_with_dependent {
@@ -204,7 +211,7 @@ sub do_something_with_dependent {
             @{$obj->{dependencies_split}};
         my @filtered = grep {$_->{type}=~/$filter/} @dependent;
         if (!scalar @filtered) {
-            return $binary?0:"NONE";
+            return $binary?0:q(NONE);
         } else {
             my $filtered_number = $filtered[0]->{this_number};
             my $dep_word_as_object = {
@@ -230,10 +237,11 @@ sub is_word_nominal {
     return $number_pro_noun;
 }
 #FEATURE(1..2)
-sub presence_subject {
+sub present_subject {
     my $type_number = shift;
     my $type = ($type_number == 1)? "(n|x)subj|agent":"(c|x)subj|agent";
-    return do_something_with_dependent(sub{
+    return ["present_subject_$type_number",
+      do_something_with_dependent(sub{
         my $word = shift;
         my $is = is_word_nominal($word);
         if ($type_number == 1) {
@@ -243,7 +251,7 @@ sub presence_subject {
              #I think
              return $is?0:1;
         }
-    }, $type, 1);
+    }, $type, 1)];
 }
 
 sub check_if_dependent_is_plural {
@@ -267,7 +275,8 @@ sub word_as_category {
 
 #FEATURE()
 sub plural_subject {
-    return check_if_dependent_is_plural( "subj");
+    return ["plural_subject", 
+        check_if_dependent_is_plural( "subj")];
 }
 
 my %object_types = qw(
@@ -284,18 +293,20 @@ $object_types{7}='('.join("|",@object_types{1..6}).')';
 #FEATURE(1..7)
 sub present_object {
     my $type_number = shift;
-    return simple_dependent_check($object_types{$type_number});
+    return ["present_object_$type_number",
+        simple_dependent_check($object_types{$type_number})];
 }
 
 #FEATURE()
 sub plural_object {
-    return check_if_dependent_is_plural($object_types{7});
+    return ["plural_object",
+        check_if_dependent_is_plural($object_types{7})];
 }
 
 #FEATURE()
 sub particle_word {
     my $type = "prt";
-    return word_as_category($type);
+    return ["particle_word", word_as_category($type)];
 }
 
 Readonly my %adverbial_types => qw (
@@ -307,7 +318,8 @@ Readonly my %adverbial_types => qw (
 #FEATURE(1..4)
 sub present_adverbial {
     my $type_number = shift;
-    return simple_dependent_check($adverbial_types{$type_number}); 
+    return ["present_adverbial_$type_number", 
+        simple_dependent_check($adverbial_types{$type_number})]; 
 }
 
 Readonly my %adverbial_categorical_types => qw(
@@ -317,16 +329,17 @@ Readonly my %adverbial_categorical_types => qw(
 #FEATURE(1..2)
 sub adverbial_word {
     my $type_number = shift;
-    return word_as_category($adverbial_categorical_types{$type_number});
+    return ["adverbial_word_$type_number",
+        word_as_category($adverbial_categorical_types{$type_number})];
 }
 
 #FEATURE()
 sub prepc{
-    return do_something_with_dependent( sub{
+    return ["prepc", do_something_with_dependent( sub{
         my $type_found = $_[0]->{dependency}->{type};
         $type_found =~ s/prepc_//;
         return $type_found;
-    }, "prepc_", 0);
+    }, "prepc_", 0)];
 }
 
 my %_semantic_class_of;
@@ -369,28 +382,64 @@ sub nominal_class_of_type {
 #FEATURE(1..50)
 sub nominal_subject_class {
     my $class = shift;
-    return nominal_class_of_type($class, "(n|x)subj|agent"); 
+    return ["nominal_s_class_$class", 
+        nominal_class_of_type($class, "(n|x)subj|agent")]; 
 }
 
 #FEATURE(1..50)
 sub nominal_object_class {
     my $class = shift;
-    return nominal_class_of_type($class, $object_types{7}); 
+    return ["nominal_o_class_$class", 
+        nominal_class_of_type($class, $object_types{7})]; 
 }
 #FEATURE(-1..1 \0, 1..50)
 sub around_class {
     my $away = shift;
     my $class = shift;
-    return check_morph_words_around($away, sub{
+    return ["around_class_$away"."_$class",
+     check_morph_words_around($away, sub{
         my $morph = shift;
         if ($morph->{POS} !~ /^N/) {
             return 0;
         }
         return semantic_class_equals($morph->{lemma}, $class);
-    });
+    })];
+}
+sub all_features {
+    my @res;
+    push (@res, is_modality(1), is_modality(2));
+    push (@res, is_passive);
+    push (@res, is_negation);
+    push (@res, map {is_to_be_around($_)} (-3..3));
+    push (@res, map {is_tense($_)} (1..5));
+    for my $i ((-3..-1), (1..3)) {
+        for my $j (1..8) {
+            push (@res, is_POS_around($i, $j));
+        }
+    }
+    push(@res, map {present_subject($_)} (1..2));
+    push(@res, plural_subject);
+    push(@res, map {present_object($_)} (1..7));
+    push(@res, plural_object);
+    push(@res, particle_word);
+    push(@res, map {present_adverbial($_)} (1..4));
+    push(@res, map {adverbial_word($_)}(1..2));
+    push(@res, prepc);
+    push (@res, map {nominal_subject_class($_)}(1..50));
+    push (@res, map {nominal_object_class($_)}(1..50));
+    push (@res, map {around_class(1,$_)}(1..50)); 
+    push (@res, map {around_class(-1,$_)}(1..50));
+    return @res;
 }
 
-#for_every_line($sloveso, words_around(0, "VB"));
-for_every_line($sloveso, around_class(-1, 49));
-
-
+my @r = all_features;
+if($ARGV[0] eq "TABULKA") {
+    print "\tsemantic_class";
+    for(@r){$_->[0]=~s/-/m/g;print "\t".$_->[0]};
+    print "\n";
+    for_every_line($sloveso, map {$_->[1]} @r);
+} else {
+   print q(formula<-"semantic_class~);
+   print join "+", map {$_->[0]=~s/-/m/g;$_->[0]} @r;
+   say q(");
+}

@@ -1,0 +1,8 @@
+all_table<-read.table("all_data")
+
+working_table<-all_table[1:200,]
+testing_table<-all_table[201:250,]
+
+for (cross_validation_number in (1:10)) {
+   1 
+}
