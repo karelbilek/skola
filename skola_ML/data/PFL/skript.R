@@ -21,12 +21,13 @@ for (cross_validation_number in (0:10)) {
 
     names <- names(test_table_without_class)[features_to_take==1]
     formula <- as.formula(paste("semantic_class ~ ", paste(names, collapse= "+")))
-    classifier<-rpart(formula, data=train_table, method="class")
+    classifier<-rpart(formula, data=train_table, method="class", 
+        control = rpart.control(minsplit = 40))
     
     found_classes <- predict(classifier, test_table_without_class, type="class")
     same <- found_classes == correct_classes
     correctness<-correctness + length(same[same])
 }
 
-write(correctness/220, "experiment_output")
+print(correctness/220)
 
