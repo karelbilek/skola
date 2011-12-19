@@ -1,7 +1,7 @@
 10
 
 dir
-1886
+1914
 https://svn.ms.mff.cuni.cz/svn/undergrads/students/bilek/2011-npfl092/ahw04
 https://svn.ms.mff.cuni.cz/svn/undergrads
 
@@ -32,7 +32,7 @@ file
 
 
 
-2011-12-05T08:49:07.000000Z
+2011-12-12T07:05:42.000000Z
 eaac3f412539da4bb12d3457317b4e83
 2011-12-05T08:50:33.266693Z
 1886
@@ -60,47 +60,13 @@ has-props
 
 473
 
-substrings.pl
-file
-
-
-
-
-2011-12-05T08:49:07.000000Z
-108bd6fde353bd8adff8af5384162867
-2011-12-05T08:50:33.266693Z
-1886
-bilek
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-2987
-
 Makefile
 file
 
 
 
 
-2011-12-05T08:49:07.000000Z
+2011-12-12T07:05:42.000000Z
 58971acfef99123c6a7b44ec8fa275d0
 2011-12-05T08:50:33.266693Z
 1886
@@ -127,4 +93,38 @@ bilek
 
 
 117
+
+substrings.pl
+file
+
+
+
+
+2011-12-12T07:05:42.000000Z
+108bd6fde353bd8adff8af5384162867
+2011-12-05T08:50:33.266693Z
+1886
+bilek
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2987
 
