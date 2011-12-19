@@ -1,0 +1,58 @@
+<!ELEMENT corpus (sentence*)>
+<!ELEMENT sentence (token*)>
+<!ELEMENT token (form, lemma)>
+<!ELEMENT lemma (#PCDATA)>
+<!ELEMENT form (#PCDATA)>
+<!ATTLIST token pos (n|v|d|s|a|f|z|p|r|c|w) #REQUIRED
+                postype (proper
+                    |article
+                    |auxiliary
+                    |common
+                    |coordinating
+                    |currency
+                    |demonstrative
+                    |indefinite
+                    |main
+                    |negative
+                    |numeral
+                    |ordinal
+                    |percentage
+                    |personal
+                    |possessive
+                    |preposition
+                    |qualificative
+                    |relative
+                    |semiauxiliary
+                    |subordinating) #IMPLIED
+                
+                gen (c|m|f) #IMPLIED
+                
+                num (c|p|s) #IMPLIED
+                
+                person (1|3) #IMPLIED
+                
+                mood (gerund
+                    |indicative
+                    |infinitive
+                    |pastparticiple
+                    |subjunctive) #IMPLIED
+                
+                tense (future
+                    |imperfect
+                    |present) #IMPLIED
+                
+                contracted (yes) #IMPLIED
+                
+                punct (bracket
+                |comma
+                |mathsign
+                |period) #IMPLIED
+                
+                posfunction (participle) #IMPLIED
+               
+                punctenclose (open|close) #IMPLIED
+
+                case (accusative|dative) #IMPLIED
+> 
+
+<!ATTLIST corpus language CDATA #REQUIRED>

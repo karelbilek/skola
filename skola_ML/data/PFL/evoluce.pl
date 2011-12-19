@@ -1,0 +1,68 @@
+use strict;
+use warnings;
+use 5.010;
+
+use AI::Genetic;
+
+
+my $last_gen=0;
+my $ga = new AI::Genetic(
+    -fitness    =>  \&do_experiment ,
+    -type       => 'bitvector',
+    -population => 70,
+    -crossover  => 0.9,
+    -mutation   => 0.1,
+    -terminate  => sub {
+        my $sc = $_[0]->getFittest->score;
+        if ($last_gen==$sc) {
+            return 1;
+        }
+        $last_gen=$sc;
+        say "Konec generace. Nejvic fit je ".$sc;
+        return 0 },
+);
+
+my %did;
+my $pokusy=0;
+
+sub write_out {
+    my $what = shift;
+    my $where = shift;
+
+    my $to_write;
+    for (@$what) {
+        if ($_) {
+            $to_write.="1 ";        
+        } else {
+            $to_write.="0 ";
+        }
+    }
+    open my $outf, ">", $where;
+    print $outf $to_write."\n";
+    close $outf;
+    
+    return $to_write;
+}
+
+sub do_experiment {
+    my $array = shift;
+    $pokusy++;
+    my $to_write = write_out($array, "feature_took");
+    if (exists $did{$to_write}) {return $did{$to_write}}
+
+    system" R --no-save <skript.R >/dev/null";
+    open my $inf, "<", "experiment_output";
+    my $line = <$inf>;
+    close $inf;
+    chomp $line;
+    
+    say "Zatim vysledek $pokusy -  ".(0+$line);
+    
+    $did{$to_write}=0+$line;
+    return 0+$line;
+}
+
+$ga->init(283);
+$ga->evolve('rouletteTwoPoint', 4);
+my $l = $ga->getFittest->genes();
+write_out($l, "feature_took_final");

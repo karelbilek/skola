@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Readonly;
 
-Readonly my $sloveso => "arrive";
+Readonly my $sloveso => $ARGV[0];
 
 Readonly my %type_for_line=> qw(
     1 id
@@ -58,7 +58,7 @@ sub for_every_line {
                 my @split = split(/;/, $line);
                 my @words = map{
                     my ($type, $head, $head_nu, $this, $this_nu) = 
-                        $_ =~ /(.*)\((.*)-(.*?)'?, (.*)-(.*?)'?\)/;
+                        $_ =~ /(.*)\((.*)-(.*?)'*, (.*)-(.*?)'*\)/;
                     my $object_dep = {
                         type=>$type,
                         head_word=>$head,
@@ -433,13 +433,8 @@ sub all_features {
 }
 
 my @r = all_features;
-if($ARGV[0] eq "TABULKA") {
     print "\tsemantic_class";
     for(@r){$_->[0]=~s/-/m/g;print "\t".$_->[0]};
     print "\n";
     for_every_line($sloveso, map {$_->[1]} @r);
-} else {
-   print q(formula<-"semantic_class~);
-   print join "+", map {$_->[0]=~s/-/m/g;$_->[0]} @r;
-   say q(");
-}
+
