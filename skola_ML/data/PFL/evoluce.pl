@@ -4,7 +4,7 @@ use 5.010;
 
 use AI::Genetic;
 
-
+my $counter_sames;
 my $last_gen=0;
 my $ga = new AI::Genetic(
     -fitness    =>  \&do_experiment ,
@@ -15,8 +15,15 @@ my $ga = new AI::Genetic(
     -terminate  => sub {
         my $sc = $_[0]->getFittest->score;
         if ($last_gen==$sc) {
-            return 1;
+            $counter_sames++;
+            if ($counter_sames<3) {
+                say "Konec podminene generace. Nejvic fit je ".$sc;
+                return 0;
+            } else{
+                return 1;
+            }
         }
+        $counter_sames = 0;
         $last_gen=$sc;
         say "Konec generace. Nejvic fit je ".$sc;
         return 0 },
