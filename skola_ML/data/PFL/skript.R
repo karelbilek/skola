@@ -29,5 +29,5 @@ for (cross_validation_number in (0:10)) {
     correctness<-correctness + length(same[same])
 }
 
-print(correctness/220)
+write(correctness/220, "experiment_output");
 

@@ -15,6 +15,7 @@ Readonly my %type_for_line=> qw(
 );
 
 sub for_every_line {
+    my @all_res;
     my $name = shift;
     my @subs = @_;
     open my $inf, "<", "data/development.instances/$name.txt";
@@ -71,13 +72,15 @@ sub for_every_line {
                 $object{dependencies_split} = \@words;
             }
         } else {
-            print $object{id}."\t";
-            print $object{pattern}."\t";
-            my @res = map {$_->(\%object)} @subs;
-            if (scalar@res != scalar @subs) {
+            my @line_res;
+            push @line_res, $object{id};
+            push @line_res, $object{pattern};
+            my @nus = map {$_->(\%object)} @subs;
+            if (scalar@nus != scalar @subs) {
                 die "Something fishy at sentence number ".$object{id};
             }
-            say join "\t", @res;
+            push @line_res, @nus;
+            push @all_res, \@line_res;
             #say $object{dependencies};
             #say $object{verb_number};
             #say $object{sentence};
@@ -88,6 +91,7 @@ sub for_every_line {
     } continue {
         $i++;
     }
+    return @all_res;
 }
 
 sub dependency_has {
@@ -433,8 +437,44 @@ sub all_features {
 }
 
 my @r = all_features;
-    print "\tsemantic_class";
-    for(@r){$_->[0]=~s/-/m/g;print "\t".$_->[0]};
-    print "\n";
-    for_every_line($sloveso, map {$_->[1]} @r);
+my @head = ("", "semantic_class");
 
+        #nemuze mit minus :/
+for(@r){$_->[0]=~s/-/m/g;push (@head, $_->[0])};
+my @res = for_every_line($sloveso, map {$_->[1]} @r);
+
+my %not_printing;
+for my $column (2..$#head) {
+    my $first_found = $res[0]->[$column];
+    my $is_different=0;
+    ROWS:
+    for my $row (0..$#res) {
+        if ($res[$row]->[$column] ne $first_found) {
+            $is_different=1;
+            last ROWS;
+        }
+    }
+    if (!$is_different) {
+        $not_printing{ $column }=1;
+    }
+}
+
+for my $column (0..$#head) {
+    if (!exists $not_printing{$column}){
+        print $head[$column]."\t";
+    }
+}
+print "\n";
+
+for my $row (0..$#res) {
+    for my $column (0..$#head) {
+        if (!exists $not_printing{$column}){
+            print $res[$row]->[$column]."\t";
+        }
+    }
+    print "\n";
+}
+
+my $count = 283 - scalar keys %not_printing;
+use File::Slurp;
+write_file("feature_count", $count);

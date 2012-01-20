@@ -62,7 +62,13 @@ sub do_experiment {
     return 0+$line;
 }
 
-$ga->init(283);
+sub find_nulls {
+    
+}
+
+use File::Slurp;
+my $count = read_file("feature_count");
+$ga->init($count);
 $ga->evolve('rouletteTwoPoint', 4);
 my $l = $ga->getFittest->genes();
 write_out($l, "feature_took_final");
