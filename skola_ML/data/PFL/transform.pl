@@ -466,6 +466,9 @@ for my $column (0..$#head) {
 }
 print "\n";
 
+use List::Util qw(shuffle);
+@res = shuffle(@res);
+
 for my $row (0..$#res) {
     for my $column (0..$#head) {
         if (!exists $not_printing{$column}){
