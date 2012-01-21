@@ -11,7 +11,7 @@ my $ga = new AI::Genetic(
     -type       => 'bitvector',
     -population => 70,
     -crossover  => 0.9,
-    -mutation   => 0.3,
+    -mutation   => 0.7,
     -terminate  => sub {
         my $sc = $_[0]->getFittest->score;
         if ($last_gen==$sc) {
@@ -69,14 +69,10 @@ sub do_experiment {
     return 0+$line;
 }
 
-sub find_nulls {
-    
-}
-
 use File::Slurp;
 my $count = read_file("current_results/feature_count");
 
 $ga->init($count);
 $ga->evolve('rouletteTwoPoint', 4);
 my $l = $ga->getFittest->genes();
-write_out($l, "feature_took_final");
+write_out($l, "current_results/feature_took_final");
