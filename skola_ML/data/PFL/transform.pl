@@ -477,4 +477,4 @@ for my $row (0..$#res) {
 
 my $count = 283 - scalar keys %not_printing;
 use File::Slurp;
-write_file("feature_count", $count);
+write_file("current_results/feature_count", $count);

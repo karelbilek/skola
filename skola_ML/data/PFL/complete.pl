@@ -1,9 +1,11 @@
 use strict;
 use warnings;
 
+mkdir "current_results";
+
 my $sloveso=$ARGV[0];
 #first I have to process the files into all_data
-system("perl transform.pl $sloveso > all_data");
+system("perl transform.pl $sloveso > current_results/all_data");
 
 #then, I need to select the right feature vectors by running evolutionary
 #algorithm

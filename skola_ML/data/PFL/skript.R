@@ -1,15 +1,27 @@
+argument <- commandArgs(trailingOnly = TRUE);
+
 library(rpart)
 
-all_table<-read.table("all_data")
+all_table<-read.table("current_results/all_data")
 
 working_table<-all_table[1:220,]
 heldout_table<-all_table[221:250,]
 
-features_to_take <- scan("feature_took")
+features_to_take <- scan("current_results/feature_took")
+
+
+if (argument=="DT") {
+    classify <- function(formula, train_data, test_data) {
+        classifier<-rpart(formula, data=train_data, method="class", 
+            control = rpart.control(minsplit = 40))
+    
+        found_classes <- predict(classifier, test_data, type="class")
+        return(found_classes);
+    }
+}
 
 correctness <- 0
 for (cross_validation_number in (0:10)) {
-
 
     starting_line<-cross_validation_number*20+1;
     ending_line<-starting_line+19;
@@ -21,13 +33,12 @@ for (cross_validation_number in (0:10)) {
 
     names <- names(test_table_without_class)[features_to_take==1]
     formula <- as.formula(paste("semantic_class ~ ", paste(names, collapse= "+")))
-    classifier<-rpart(formula, data=train_table, method="class", 
-        control = rpart.control(minsplit = 40))
     
-    found_classes <- predict(classifier, test_table_without_class, type="class")
+    found_classes <- classify(formula, train_table, test_table_without_class);
+
     same <- found_classes == correct_classes
     correctness<-correctness + length(same[same])
 }
 
-write(correctness/220, "experiment_output");
+write(correctness/220, "current_results/experiment_output");
 

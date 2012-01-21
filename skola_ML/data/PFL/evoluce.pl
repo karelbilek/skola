@@ -54,11 +54,11 @@ sub write_out {
 sub do_experiment {
     my $array = shift;
     $pokusy++;
-    my $to_write = write_out($array, "feature_took");
+    my $to_write = write_out($array, "current_results/feature_took");
     if (exists $did{$to_write}) {return $did{$to_write}}
 
-    system" R --no-save <skript.R >/dev/null";
-    open my $inf, "<", "experiment_output";
+    system" R --no-save --args DT <skript.R >/dev/null";
+    open my $inf, "<", "current_results/experiment_output";
     my $line = <$inf>;
     close $inf;
     chomp $line;
@@ -74,7 +74,8 @@ sub find_nulls {
 }
 
 use File::Slurp;
-my $count = read_file("feature_count");
+my $count = read_file("current_results/feature_count");
+
 $ga->init($count);
 $ga->evolve('rouletteTwoPoint', 4);
 my $l = $ga->getFittest->genes();
