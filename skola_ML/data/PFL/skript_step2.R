@@ -85,7 +85,7 @@ correctnesses <- apply(opts_grid, 1, try);
 
 best<-which.max(correctnesses);
 
-possibilities[best,]
-write.table(possibilities[best,], "current_results/best_possibilities");
+opts_grid[best,]
+write.table(opts_grid[best,], "current_results/best_possibilities");
 write(max(correctnesses), "current_results/k_fold__result");
 
