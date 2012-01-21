@@ -1,20 +1,56 @@
 library(rpart)
 
-all_table<-read.table("all_data")
+all_table<-read.table("current_results/all_data")
 
 working_table<-all_table[1:220,]
 heldout_table<-all_table[221:250,]
 
-features_to_take <- scan("feature_took_final")
+features_to_take <- scan("current_results/feature_took_final")
+
+#tohle by 100% slo pres objekty, ale ty jsou v R nejak hrozne divne
+
+get_opts <- function() {
+    return (expand.grid( 
+        should_prune = c(0,0.001, 0.002,0.005,0.01,0.02,0.05, 0.1, 0.2, 0.5) , 
+        splitting_type = c("gini", "information"),
+        min_split = c(1, 2, 5, 10, 20, 50, 100),
+        c_p = c(0.001, 0.002,0.005,0.01,0.02,0.05,0.1,0.2,0.5)
+    ));
+}
+
+classify <- function(formula, train_data, test_data, opts) {
+
+    classifier<-rpart(
+        formula, 
+        data = train_data, 
+        method = "class",
+        parms = list (
+            split = opts["splitting_type"]
+        ), 
+        control = rpart.control(
+            cp = as.numeric(opts["c_p"]),
+            minsplit = as.numeric(opts["min_split"])
+        )
+    )
+    
+    if (as.numeric(opts["should_prune"]) > 0) {
+        classifier<-prune(
+            classifier , 
+            cp = as.numeric(opts["should_prune"])
+        )
+    }
+
+    found_classes <- predict(classifier, test_data, type = "class")
+    
+    return(found_classes);
+}
 
 pokus<-0;
 
-try <- function(should_prune, splitting_type, min_split, c_p) {
-
+try <- function(opts) {
 
     correctness <- 0
     pokus<<-pokus+1;
-    print(pokus);
     for (cross_validation_number in (0:10)) {
 
 
@@ -28,18 +64,13 @@ try <- function(should_prune, splitting_type, min_split, c_p) {
 
         names <- names(test_table_without_class)[features_to_take==1]
         formula <- as.formula(paste("semantic_class ~ ", paste(names, collapse= "+")))
-        classifier<-rpart(formula, data=train_table, method="class",
-            parms=list(split=splitting_type), control=rpart.control(cp=c_p,
-                minsplit=min_split))
         
-        if (should_prune>0) {
-            classifier<-prune(classifier, cp=should_prune)
-        }
-
+        found_classes <- classify(
+            formula, 
+            train_table,
+            test_table_without_class,
+            opts);
         
-
-        
-        found_classes <- predict(classifier, test_table_without_class, type="class")
         same <- found_classes == correct_classes
         correctness<-correctness + length(same[same])
     }
@@ -47,17 +78,14 @@ try <- function(should_prune, splitting_type, min_split, c_p) {
     return(correctness/220)
 }
 
-possibilities <- expand.grid( c(0,0.002,0.005,0.01,0.02,0.05) , c("gini", "information"),
-                    c(2, 5, 10, 20, 50, 100),
-                    c(0.002,0.005,0.01,0.02,0.05,0.1,0.2,0.5))
 
-correctnesses <- apply(possibilities, 1, 
-                function(a) try(as.numeric(a[1]), a[2], as.numeric(a[3]),
-                as.numeric(a[4])));
+opts_grid <- get_opts()
+
+correctnesses <- apply(opts_grid, 1, try);
 
 best<-which.max(correctnesses);
 
 possibilities[best,]
-max(correctnesses);
-write.table(possibilities[best,], "best_possibilities");
+write.table(possibilities[best,], "current_results/best_possibilities");
+write(max(correctnesses), "current_results/k_fold__result");
 
