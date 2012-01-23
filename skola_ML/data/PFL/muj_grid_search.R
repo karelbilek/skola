@@ -22,11 +22,11 @@ more_tries <- function(opts) {
             );
    }
 
-    return(average_correctness/10)
+   return(average_correctness/10)
 }
 
 
-opts_grid <- get_opts_grid()
+opts_grid <- get_opts_grid(argument)
 
 correctnesses <- apply(opts_grid, 1, more_tries);
 

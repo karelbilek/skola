@@ -13,7 +13,7 @@ my $ga = new AI::Genetic(
     -type       => 'bitvector',
     -population => 70,
     -crossover  => 0.9,
-    -mutation   => 0.7,
+    -mutation   => 0.5,
     -terminate  => sub {
         my $sc = $_[0]->getFittest->score;
         if ($last_gen==$sc) {

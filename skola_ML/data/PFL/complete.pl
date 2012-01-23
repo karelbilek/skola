@@ -21,6 +21,6 @@ system("R --no-save --args $type < muj_grid_search.R");
 system("R --no-save --args $type < muj_grid_final.R");
 
 mkdir "results";
-system ("mv test_result results/$type.muj_search.perc.$sloveso");
-system ("mv current_results/feature_took_final results/$type.feats.$sloveso");
-system ("mv current_results/best_options results/$type.muj_search.opts.$sloveso");
+system ("cp current_results/test_result results/$type.muj_search.perc.$sloveso");
+system ("cp current_results/feature_took_final results/$type.feats.$sloveso");
+system ("cp current_results/best_options results/$type.muj_search.opts.$sloveso");
