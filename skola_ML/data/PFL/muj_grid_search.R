@@ -1,3 +1,4 @@
+argument <- commandArgs(trailingOnly = TRUE);
 source("shared.R");
 
 working_range<- 1:220
@@ -16,11 +17,12 @@ more_tries <- function(opts) {
                 working_range[ -starting_line : -ending_line],
                 working_range[ starting_line : ending_line],
                 features_to_take,
+                argument, 0, 0, 
                 opts
             );
    }
 
-    return(average_correctness)
+    return(average_correctness/10)
 }
 
 

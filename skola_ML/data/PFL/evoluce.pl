@@ -4,6 +4,8 @@ use 5.010;
 
 use AI::Genetic;
 
+my $type = $ARGV[0];
+
 my $counter_sames;
 my $last_gen=0;
 my $ga = new AI::Genetic(
@@ -57,7 +59,7 @@ sub do_experiment {
     my $to_write = write_out($array, "current_results/feature_took");
     if (exists $did{$to_write}) {return $did{$to_write}}
 
-    system" R --no-save --args DT <skript.R >/dev/null";
+    system" R --no-save --args $type <evolution_try.R >/dev/null";
     open my $inf, "<", "current_results/experiment_output";
     my $line = <$inf>;
     close $inf;
