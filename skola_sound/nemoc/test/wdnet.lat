@@ -1,58 +1,121 @@
 VERSION=1.0
-N=21   L=35   
+N=49   L=70   
 I=0    W=!NULL               
 I=1    W=!NULL               
-I=2    W=ZAST\330EL          
-I=3    W=!NULL               
-I=4    W=ZABIJ               
-I=5    W=POD\330\315ZNI      
-I=6    W=ZAKA\256            
-I=7    W=VYHO\317            
-I=8    W=JI\330\315HO        
-I=9    W=PAROUBKA            
-I=10   W=!NULL               
-I=11   W=DAVIDA              
-I=12   W=RATHA               
-I=13   W=MIROSLAVA           
-I=14   W=KALOUSKA            
-I=15   W=MARTINA             
-I=16   W=BURS\315KA          
-I=17   W=V\251ECHNY          
-I=18   W=TY                  
-I=19   W=DEBILY              
-I=20   W=DEMENTY             
-J=0     S=10   E=1    
+I=2    W=SIL                 
+I=3    W=NATOC               
+I=4    W=VOLANT              
+I=5    W=DOLEVA              
+I=6    W=!NULL               
+I=7    W=DOPRAVA             
+I=8    W=SLAPNI              
+I=9    W=NA                  
+I=10   W=BRZDU               
+I=11   W=PLYN                
+I=12   W=SPOJKU              
+I=13   W=PRESTAN             
+I=14   W=SLAPAT              
+I=15   W=NA                  
+I=16   W=BRZDU               
+I=17   W=PLYN                
+I=18   W=SPOJKU              
+I=19   W=ZAPNI               
+I=20   W=PREDNI              
+I=21   W=!NULL               
+I=22   W=ZADNI               
+I=23   W=STERACE             
+I=24   W=LEVY                
+I=25   W=!NULL               
+I=26   W=PRAVY               
+I=27   W=BLINKR              
+I=28   W=DALKOVA             
+I=29   W=!NULL               
+I=30   W=POTKAVACI           
+I=31   W=MLHOVA              
+I=32   W=SVETLA              
+I=33   W=VYPNI               
+I=34   W=PREDNI              
+I=35   W=!NULL               
+I=36   W=ZADNI               
+I=37   W=STERACE             
+I=38   W=LEVY                
+I=39   W=!NULL               
+I=40   W=PRAVY               
+I=41   W=BLINKR              
+I=42   W=DALKOVA             
+I=43   W=!NULL               
+I=44   W=POTKAVACI           
+I=45   W=MLHOVA              
+I=46   W=SVETLA              
+I=47   W=ZATRUB              
+I=48   W=SIL                 
+J=0     S=48   E=1    
 J=1     S=0    E=2    
 J=2     S=2    E=3    
-J=3     S=4    E=3    
-J=4     S=5    E=3    
-J=5     S=6    E=3    
-J=6     S=7    E=3    
-J=7     S=0    E=4    
-J=8     S=0    E=5    
-J=9     S=0    E=6    
-J=10    S=0    E=7    
-J=11    S=3    E=8    
-J=12    S=3    E=9    
-J=13    S=8    E=9    
-J=14    S=9    E=10   
-J=15    S=12   E=10   
-J=16    S=14   E=10   
-J=17    S=16   E=10   
-J=18    S=19   E=10   
-J=19    S=20   E=10   
-J=20    S=3    E=11   
-J=21    S=3    E=12   
-J=22    S=11   E=12   
-J=23    S=3    E=13   
-J=24    S=3    E=14   
-J=25    S=13   E=14   
-J=26    S=3    E=15   
-J=27    S=3    E=16   
-J=28    S=15   E=16   
-J=29    S=3    E=17   
-J=30    S=17   E=18   
-J=31    S=3    E=19   
-J=32    S=18   E=19   
-J=33    S=3    E=20   
-J=34    S=18   E=20   
+J=3     S=3    E=4    
+J=4     S=4    E=5    
+J=5     S=5    E=6    
+J=6     S=7    E=6    
+J=7     S=10   E=6    
+J=8     S=11   E=6    
+J=9     S=12   E=6    
+J=10    S=16   E=6    
+J=11    S=17   E=6    
+J=12    S=18   E=6    
+J=13    S=23   E=6    
+J=14    S=27   E=6    
+J=15    S=32   E=6    
+J=16    S=37   E=6    
+J=17    S=41   E=6    
+J=18    S=46   E=6    
+J=19    S=47   E=6    
+J=20    S=4    E=7    
+J=21    S=2    E=8    
+J=22    S=8    E=9    
+J=23    S=9    E=10   
+J=24    S=9    E=11   
+J=25    S=9    E=12   
+J=26    S=2    E=13   
+J=27    S=13   E=14   
+J=28    S=14   E=15   
+J=29    S=15   E=16   
+J=30    S=15   E=17   
+J=31    S=15   E=18   
+J=32    S=2    E=19   
+J=33    S=19   E=20   
+J=34    S=20   E=21   
+J=35    S=22   E=21   
+J=36    S=19   E=22   
+J=37    S=21   E=23   
+J=38    S=19   E=24   
+J=39    S=24   E=25   
+J=40    S=26   E=25   
+J=41    S=19   E=26   
+J=42    S=25   E=27   
+J=43    S=19   E=28   
+J=44    S=28   E=29   
+J=45    S=30   E=29   
+J=46    S=31   E=29   
+J=47    S=19   E=30   
+J=48    S=19   E=31   
+J=49    S=29   E=32   
+J=50    S=2    E=33   
+J=51    S=33   E=34   
+J=52    S=34   E=35   
+J=53    S=36   E=35   
+J=54    S=33   E=36   
+J=55    S=35   E=37   
+J=56    S=33   E=38   
+J=57    S=38   E=39   
+J=58    S=40   E=39   
+J=59    S=33   E=40   
+J=60    S=39   E=41   
+J=61    S=33   E=42   
+J=62    S=42   E=43   
+J=63    S=44   E=43   
+J=64    S=45   E=43   
+J=65    S=33   E=44   
+J=66    S=33   E=45   
+J=67    S=43   E=46   
+J=68    S=2    E=47   
+J=69    S=6    E=48   
