@@ -7,7 +7,7 @@ heldout_range<- 221:250
 features_to_take <- scan("current_results/feature_took")
 
 correctness <- 
-    try(working_range, heldout_range, features_to_take, default_opts());
+    try(working_range, heldout_range, features_to_take, "DT",0,0);
 
 write(correctness, "current_results/experiment_output");
 
