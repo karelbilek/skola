@@ -12,9 +12,25 @@ get_opts_grid <- function(type) {
             c_p = c(0.001, 0.002,0.005,0.01,0.02,0.05,0.1,0.2,0.5)
         ));
     }
-
-
-
+    if (type=="SVM") {
+        grid <- (expand.grid(
+            scale = c(TRUE, FALSE),
+            kernel = c("linear", "polynomial", "radial basis", "sigmoid"),
+            degree = c(1,2,3),
+            gamma = c(0, 1/50,1/20,1/10, 1/5, 1/2),
+            coef0 = c(0,1,2,5,10,20),
+            cost = c(0.1,0.2,0.5,1),
+            shrinking = c(TRUE,FALSE),
+            probability = c(TRUE,FALSE)
+        ))
+        grid <- grid[
+            (grid["kernel"]!="linear" | grid["gamma"]==1/50)
+            &
+            (grid["kernel"]=="polynomial" | grid["kernel"]=="sigmoid" | grid["coef0"]==0 ) 
+            &
+            ( grid["kernel"] == "polynomial" | grid["degree"]==1),];
+        return (grid);
+    }
 }
 
 custom_classifier <- function(type, formula, train_data, opts) {
@@ -42,8 +58,78 @@ custom_classifier <- function(type, formula, train_data, opts) {
 
         return (classifier);
     }
-
-    
+    if (type == "SVM") {
+        if (opts["kernel"]=="linear") {
+            classifier <- svm(formula,
+                            data=train_data,
+                            scale = as.logical(opts["scale"]),
+                            cost = as.numeric(opts["cost"]),
+                            shrinking = as.logical(opts["shrinking"]),
+                            probability = as.logical(opts["probability"]))
+            
+        }
+        if (opts["kernel"]=="polynomial") {
+            if (opts["gamma"]==0) {
+                classifier <- svm(formula,
+                                data=train_data,
+                                scale = as.logical(opts["scale"]),
+                                cost = as.numeric(opts["cost"]),
+                                shrinking = as.logical(opts["shrinking"]),
+                                coef0 = as.numeric(opts["coef0"]),
+                                probability = as.logical(opts["probability"]),
+                                degree = as.numeric(opts["degree"]))
+             } else {
+                classifier <- svm(formula,
+                                data=train_data,
+                                scale = as.logical(opts["scale"]),
+                                cost = as.numeric(opts["cost"]),
+                                shrinking = as.logical(opts["shrinking"]),
+                                coef0 = as.numeric(opts["coef0"]),
+                                probability = as.logical(opts["probability"]),
+                                gamma = as.numeric(opts["gamma"]),
+                                degree = as.numeric(opts["degree"]))
+             }
+        }
+        if (opts["kernel"]=="radial basis") {
+            if (opts["gamma"]==0) {
+                classifier <- svm(formula,
+                                data=train_data,
+                                scale = as.logical(opts["scale"]),
+                                cost = as.numeric(opts["cost"]),
+                                shrinking = as.logical(opts["shrinking"]),
+                                probability = as.logical(opts["probability"]),
+                                degree = as.numeric(opts["degree"]))
+             } else {
+                classifier <- svm(formula,
+                                data=train_data,
+                                scale = as.logical(opts["scale"]),
+                                cost = as.numeric(opts["cost"]),
+                                shrinking = as.logical(opts["shrinking"]),
+                                probability = as.logical(opts["probability"]),
+                                gamma = as.numeric(opts["gamma"]),
+                                degree = as.numeric(opts["degree"]))
+             }
+        }    
+        if (opts["kernel"]=="") {
+            if (opts["gamma"]==0) {
+                classifier <- svm(formula,
+                                data=train_data,
+                                scale = as.logical(opts["scale"]),
+                                cost = as.numeric(opts["cost"]),
+                                shrinking = as.logical(opts["shrinking"]),
+                                probability = as.logical(opts["probability"]),
+                                degree = as.numeric(opts["degree"]))
+             } else {
+                classifier <- svm(formula,
+                                data=train_data,
+                                scale = as.logical(opts["scale"]),
+                                cost = as.numeric(opts["cost"]),
+                                shrinking = as.logical(opts["shrinking"]),
+                                probability = as.logical(opts["probability"]),
+                                gamma = as.numeric(opts["gamma"]));
+             }
+        }
+     }
     
 }
 
