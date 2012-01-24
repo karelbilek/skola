@@ -451,40 +451,29 @@ for(@r){
 #(pri tom ctu soubor)
 my @res = for_every_line($sloveso, map {$_->[1]} @r);
 
-#najit ty, co se nebudou brat, protoze jsou vsude stejne
 my %not_printing;
-for my $column (2..$#head) {
-    my $first_found = $res[0]->[$column];
-    my $is_different=0;
-    ROWS:
-    for my $row (0..$#res) {
-        if ($res[$row]->[$column] ne $first_found) {
-            $is_different=1;
-            last ROWS;
-        }
-    }
-    if (!$is_different) {
-        $not_printing{ $column }=1;
-    }
-}
 
 #udelat z nebinarnich binarni
-if (($ARGV[1]//"") eq "binary") {
+if (1 or ($ARGV[1]//"") eq "binary") {
     COLUMN:
     for my $column(2..$#head) {
         #zjednodusene - pokud mam ve sloupci v prvnim radku 1 ci 0
         #je to binarni, pokud ne, neni -> musim z toho udelat binarni
         #sloupecky
+
         my $first_found = $res[0]->[$column];
         if ($first_found ne "0" and $first_found ne "1") {
             #jsem tady <= neni to binarni
             my $original_feature_name = $head[$column];
+            
             my %values;
-            for my $row (0..$#res) {
-                $values{ $res[$row]->[$column] } = undef;
-            }
+            @values{ map {$res[$_][$column] } (0..$#res) } = ();
+           
             my @new_features = keys %values;
-            next COLUMN if (scalar @new_features == 1);
+            if (scalar @new_features == 1) {
+                $not_printing{ $column } = 1;
+                next COLUMN;
+            }
             
             for my $new_feature (@new_features) {
                 for my $row (0..$#res) {
@@ -505,9 +494,44 @@ if (($ARGV[1]//"") eq "binary") {
     }
 }
 
+my $treshold = 5;
+#najit ty, co se nebudou brat, protoze jsou vsude stejne
+COLUMN:
+for my $column (2..$#head) {
+    next COLUMN if ($not_printing{$column});
+    
+    my %values;
+
+    @values{ map {$res[$_][$column] } (0..$#res) } = ();
+    if (scalar keys %values == 1) {
+        $not_printing{ $column } = 1;
+        next COLUMN;
+    }
+
+    #pouzito mene, nez 5x -> pryc!
+   
+    
+    #kolikrat pouzita 1?
+    my $one_used = scalar grep {$res[$_][$column]} (0..$#res); 
+   
+    #kolikrat pouzita 0?
+
+    my $zero_used = (scalar @res) - $one_used;
+
+    if ($one_used < $treshold or $zero_used < $treshold) {
+        $not_printing{ $column } = 1;
+        next COLUMN;
+    } 
+}
+
+
+my $demence=-1;
 for my $column (0..$#head) {
     if (!exists $not_printing{$column}){
         print $head[$column]."\t";
+        if ($head[$column] eq "is_POS_around_m2_8") {
+            #$demence = $column;
+        }
     }
 }
 print "\n";
@@ -519,6 +543,9 @@ for my $row (0..$#res) {
     for my $column (0..$#head) {
         if (!exists $not_printing{$column}){
             print $res[$row]->[$column]."\t";
+            if ($column == $demence) {
+                warn $res[$row]->[$column]."\n";
+            }
         }
     }
     print "\n";
