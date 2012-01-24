@@ -494,7 +494,7 @@ if (1 or ($ARGV[1]//"") eq "binary") {
     }
 }
 
-my $treshold = 5;
+my $treshold = 4;
 #najit ty, co se nebudou brat, protoze jsou vsude stejne
 COLUMN:
 for my $column (2..$#head) {
