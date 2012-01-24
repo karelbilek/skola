@@ -17,7 +17,7 @@ more_tries <- function(opts) {
                 working_range[ -starting_line : -ending_line],
                 working_range[ starting_line : ending_line],
                 features_to_take,
-                argument, 0, 0, 
+                argument, 2, 0, 
                 opts
             );
    }

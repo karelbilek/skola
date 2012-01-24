@@ -13,7 +13,7 @@ opts<-read.table( "current_results/best_options");
 result <- try(
             working_range, test_range,
                 features_to_take,
-                argument, 0, 0, opts
+                argument, 2, 0, opts
             );
  
 
