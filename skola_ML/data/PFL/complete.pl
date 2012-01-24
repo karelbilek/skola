@@ -15,7 +15,7 @@ system("perl transform.pl $sloveso $binary > current_results/all_data");
 #(this calls R, but also needs CPAN's AI::Genetic module)
 system("perl evoluce.pl $type");
 
-die ":D" if $type eq "bagging";
+#die ":D" if $type eq "bagging";
 
 #then, with the feature set, I need to find the best parameters
 system("R --no-save --args $type < muj_grid_search.R");
