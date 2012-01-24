@@ -409,6 +409,8 @@ sub around_class {
         return semantic_class_equals($morph->{lemma}, $class);
     })];
 }
+
+#vraci featury jako funkce
 sub all_features {
     my @res;
     push (@res, is_modality(1), is_modality(2));
@@ -439,10 +441,17 @@ sub all_features {
 my @r = all_features;
 my @head = ("", "semantic_class");
 
-        #nemuze mit minus :/
-for(@r){$_->[0]=~s/-/m/g;push (@head, $_->[0])};
+        #nemuze mit minus v nazvu sloupce
+for(@r){
+    $_->[0]=~s/-/m/g;
+    push (@head, $_->[0])
+};
+
+#ted pro kazdou radku spustim spravne funkce
+#(pri tom ctu soubor)
 my @res = for_every_line($sloveso, map {$_->[1]} @r);
 
+#najit ty, co se nebudou brat, protoze jsou vsude stejne
 my %not_printing;
 for my $column (2..$#head) {
     my $first_found = $res[0]->[$column];
@@ -456,6 +465,43 @@ for my $column (2..$#head) {
     }
     if (!$is_different) {
         $not_printing{ $column }=1;
+    }
+}
+
+#udelat z nebinarnich binarni
+if (($ARGV[1]//"") eq "binary") {
+    COLUMN:
+    for my $column(2..$#head) {
+        #zjednodusene - pokud mam ve sloupci v prvnim radku 1 ci 0
+        #je to binarni, pokud ne, neni -> musim z toho udelat binarni
+        #sloupecky
+        my $first_found = $res[0]->[$column];
+        if ($first_found ne "0" and $first_found ne "1") {
+            #jsem tady <= neni to binarni
+            my $original_feature_name = $head[$column];
+            my %values;
+            for my $row (0..$#res) {
+                $values{ $res[$row]->[$column] } = undef;
+            }
+            my @new_features = keys %values;
+            next COLUMN if (scalar @new_features == 1);
+            
+            for my $new_feature (@new_features) {
+                for my $row (0..$#res) {
+                    if ($res[$row]->[$column] eq $new_feature) {
+                        push @{$res[$row]}, 1;
+                    } else {
+                        push @{$res[$row]}, 0;
+                    }
+                }
+
+                my $name = $original_feature_name."_".$new_feature;
+                push @head, $name;
+            }
+
+            $not_printing{ $column } = 1;
+            
+        }
     }
 }
 
