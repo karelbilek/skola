@@ -6,9 +6,14 @@ heldout_range<- 221:250
 
 features_to_take <- scan("current_results/feature_took_final")
 
+pokus <- 1;
 more_tries <- function(opts) {
     average_correctness <- 0
-    
+   
+   print(pokus);
+   pokus <<- pokus +1;
+
+
     for (cross_validation_number in (0:10)) {
         starting_line<-cross_validation_number*20+1;
         ending_line<-starting_line+19;
@@ -22,6 +27,7 @@ more_tries <- function(opts) {
             );
    }
 
+    print (average_correctness/10);
    return(average_correctness/10)
 }
 

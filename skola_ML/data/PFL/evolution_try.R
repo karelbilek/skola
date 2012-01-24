@@ -5,6 +5,10 @@ working_range<- 1:220
 
 features_to_take <- scan("current_results/feature_took")
 
+if (argument == "bagging") {
+    argument = "DT"
+}
+
 average_correctness<-0;
 for (cross_validation_number in (0:10)) {
     starting_line<-cross_validation_number*20+1;

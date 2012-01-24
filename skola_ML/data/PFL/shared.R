@@ -1,9 +1,18 @@
 library(rpart)
 library(e1071)
+library(adabag)
 
 all_table<-read.table("current_results/all_data")
 
 get_opts_grid <- function(type) {
+    if (type=="bagging") {
+        return (expand.grid( 
+            min_split = c( 2, 10, 50, 100),
+            c_p = c( 0.002,0.01,0.05,0.2),
+            mfinal = c(10,20,50,100,200)            
+        ));
+    }
+
     if (type=="DT") {
         return (expand.grid( 
             should_prune = c(0,0.001, 0.002,0.005,0.01,0.02,0.05, 0.1, 0.2, 0.5) , 
@@ -33,8 +42,27 @@ get_opts_grid <- function(type) {
     }
 }
 
+my_as_logical<-function(string) {
+    if (string == " TRUE") {
+        
+        return(TRUE);
+    }
+    return (FALSE);
+}
+
 custom_classifier <- function(type, formula, train_data, opts) {
-    
+    if (type=="bagging") {
+        control = rpart.control(
+            cp = as.numeric(opts["c_p"]),
+            minsplit = as.numeric(opts["min_split"])
+        )
+        classifier<-bagging(
+            formula,
+            data = train_data, 
+            mfinal = as.numeric(opts["mfinal"]));
+
+
+    }
     if (type=="DT") {
         classifier<-rpart(
             formula, 
@@ -56,36 +84,35 @@ custom_classifier <- function(type, formula, train_data, opts) {
             )
         }
 
-        return (classifier);
     }
     if (type == "SVM") {
         if (opts["kernel"]=="linear") {
             classifier <- svm(formula,
                             data=train_data,
-                            scale = as.logical(opts["scale"]),
+                            scale = my_as_logical(opts["scale"]),
                             cost = as.numeric(opts["cost"]),
-                            shrinking = as.logical(opts["shrinking"]),
-                            probability = as.logical(opts["probability"]))
+                            shrinking = my_as_logical(opts["shrinking"]),
+                            probability = my_as_logical(opts["probability"]))
             
         }
         if (opts["kernel"]=="polynomial") {
             if (opts["gamma"]==0) {
                 classifier <- svm(formula,
                                 data=train_data,
-                                scale = as.logical(opts["scale"]),
+                                scale = my_as_logical(opts["scale"]),
                                 cost = as.numeric(opts["cost"]),
-                                shrinking = as.logical(opts["shrinking"]),
+                                shrinking = my_as_logical(opts["shrinking"]),
                                 coef0 = as.numeric(opts["coef0"]),
-                                probability = as.logical(opts["probability"]),
+                                probability = my_as_logical(opts["probability"]),
                                 degree = as.numeric(opts["degree"]))
              } else {
                 classifier <- svm(formula,
                                 data=train_data,
-                                scale = as.logical(opts["scale"]),
+                                scale = my_as_logical(opts["scale"]),
                                 cost = as.numeric(opts["cost"]),
-                                shrinking = as.logical(opts["shrinking"]),
+                                shrinking = my_as_logical(opts["shrinking"]),
                                 coef0 = as.numeric(opts["coef0"]),
-                                probability = as.logical(opts["probability"]),
+                                probability = my_as_logical(opts["probability"]),
                                 gamma = as.numeric(opts["gamma"]),
                                 degree = as.numeric(opts["degree"]))
              }
@@ -94,18 +121,18 @@ custom_classifier <- function(type, formula, train_data, opts) {
             if (opts["gamma"]==0) {
                 classifier <- svm(formula,
                                 data=train_data,
-                                scale = as.logical(opts["scale"]),
+                                scale = my_as_logical(opts["scale"]),
                                 cost = as.numeric(opts["cost"]),
-                                shrinking = as.logical(opts["shrinking"]),
-                                probability = as.logical(opts["probability"]),
+                                shrinking = my_as_logical(opts["shrinking"]),
+                                probability = my_as_logical(opts["probability"]),
                                 degree = as.numeric(opts["degree"]))
              } else {
                 classifier <- svm(formula,
                                 data=train_data,
-                                scale = as.logical(opts["scale"]),
+                                scale = my_as_logical(opts["scale"]),
                                 cost = as.numeric(opts["cost"]),
-                                shrinking = as.logical(opts["shrinking"]),
-                                probability = as.logical(opts["probability"]),
+                                shrinking = my_as_logical(opts["shrinking"]),
+                                probability = my_as_logical(opts["probability"]),
                                 gamma = as.numeric(opts["gamma"]),
                                 degree = as.numeric(opts["degree"]))
              }
@@ -114,23 +141,24 @@ custom_classifier <- function(type, formula, train_data, opts) {
             if (opts["gamma"]==0) {
                 classifier <- svm(formula,
                                 data=train_data,
-                                scale = as.logical(opts["scale"]),
+                                scale = my_as_logical(opts["scale"]),
                                 cost = as.numeric(opts["cost"]),
-                                shrinking = as.logical(opts["shrinking"]),
-                                probability = as.logical(opts["probability"]),
+                                shrinking = my_as_logical(opts["shrinking"]),
+                                probability = my_as_logical(opts["probability"]),
                                 degree = as.numeric(opts["degree"]))
              } else {
                 classifier <- svm(formula,
                                 data=train_data,
-                                scale = as.logical(opts["scale"]),
+                                scale = my_as_logical(opts["scale"]),
                                 cost = as.numeric(opts["cost"]),
-                                shrinking = as.logical(opts["shrinking"]),
-                                probability = as.logical(opts["probability"]),
+                                shrinking = my_as_logical(opts["shrinking"]),
+                                probability = my_as_logical(opts["probability"]),
                                 gamma = as.numeric(opts["gamma"]));
              }
         }
      }
     
+        return (classifier);
 }
 
 try <- function(train_range, test_range, features, type,tune, boost,
@@ -141,7 +169,38 @@ try <- function(train_range, test_range, features, type,tune, boost,
         names <- names(test_table_without_class)[features==1]
         
         formula <- as.formula(paste("semantic_class ~ ", paste(names, collapse= "+")))
-      
+        
+
+        if (type=="bagging") {
+           #this is absolutely weird, but R is weird, I can't help it
+           #first, I make train_table into factor
+
+            train_table[, "semantic_class"] =
+                   factor(train_table[,"semantic_class"]);
+            levels = levels(train_table[, "semantic_class"])
+
+            test_copy = test_table_without_class;
+            test_copy[, "semantic_class"] = 
+                factor(levels[0], levels=levels)
+
+            if (tune==0) {
+                classifier<-bagging(formula, train_table);
+            } else if (tune==2) {
+                classifier <- custom_classifier("bagging", formula,
+                                        train_table, custom_options);
+
+            }
+           
+
+
+            print("tu OK");
+            found_classes <- predict.bagging(classifier,
+                                newdata = test_copy);
+            print("tu OK 2");
+            found_classes <- found_classes$class;
+            print("tu KO");
+        }
+
         if (type=="DT") {
             if (tune==0) {
                classifier<-rpart(
@@ -160,12 +219,26 @@ try <- function(train_range, test_range, features, type,tune, boost,
             found_classes <- predict(classifier, test_table_without_class, type = "class")
         }
         if (type=="SVM") {
-            classifier <- svm(
-                formula,
-                data = train_table,
-                type = "C-classification"
-            )
+            if (tune==0) {
+                classifier <- svm(
+                    formula,
+                    data = train_table,
+                    type = "C-classification"
+                )
+            }
+            if (tune == 1) {
+                classifier<-best.svm(
+                    formula,
+                    data = train_table,
+                    type = "C-classification"
+                    ) ;
+            }
+            if (tune == 2) {
+                classifier <- custom_classifier("SVM", formula, train_table,
+                                                    custom_options);
+            }
             found_classes <- predict(classifier, test_table_without_class)
+
         }
         
         same <- found_classes == correct_classes
