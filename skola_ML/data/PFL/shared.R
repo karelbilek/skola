@@ -192,7 +192,21 @@ try <- function(train_range, test_range, features, type,tune, boost,
         names <- names(test_table_without_class)[features==1]
         
         formula <- as.formula(paste("semantic_class ~ ", paste(names, collapse= "+")))
-        
+       
+        if (type=="bayes") {
+            #no options
+            train_table[, "semantic_class"] =
+                   factor(train_table[,"semantic_class"]);
+            levels = levels(train_table[, "semantic_class"])
+
+            test_copy = test_table_without_class;
+            test_copy[, "semantic_class"] = 
+                factor(levels[0], levels=levels)
+
+            classifier <- naiveBayes(formula, train_table);
+            found_classes <- predict(classifier, test_copy);
+            print(found_classes);            
+        }
 
         if (type=="bagging" | type=="boosting") {
            #this is absolutely weird, but R is weird, I can't help it
@@ -232,9 +246,11 @@ try <- function(train_range, test_range, features, type,tune, boost,
 
                 found_classes <- predict.boosting(classifier,
                                     newdata = test_copy);
+                 
  
             }
             found_classes <- found_classes$class;
+            print(found_classes);
         }
 
         if (type=="DT") {

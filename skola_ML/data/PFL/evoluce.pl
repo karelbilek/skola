@@ -75,6 +75,7 @@ use File::Slurp;
 my $count = read_file("current_results/feature_count");
 
 $ga->init($count);
+$ga->inject(1, [(1)x$count]);
 $ga->evolve('rouletteTwoPoint', 4);
 my $l = $ga->getFittest->genes();
 write_out($l, "current_results/feature_took_final");
