@@ -195,16 +195,16 @@ try <- function(train_range, test_range, features, type,tune, boost,
        
         if (type=="bayes") {
             #no options
-            train_table[, "semantic_class"] =
-                   factor(train_table[,"semantic_class"]);
-            levels = levels(train_table[, "semantic_class"])
+#            train_table[, "semantic_class"] =
+ #                  factor(train_table[,"semantic_class"]);
+#            levels = levels(train_table[, "semantic_class"])
 
-            test_copy = test_table_without_class;
-            test_copy[, "semantic_class"] = 
-                factor(levels[0], levels=levels)
+  #          test_copy = test_table_without_class;
+   #         test_copy[, "semantic_class"] = 
+    #            factor(levels[0], levels=levels)
 
             classifier <- naiveBayes(formula, train_table);
-            found_classes <- predict(classifier, test_copy);
+            found_classes <- predict(classifier, test_table_without_class);
             print(found_classes);            
         }
 
