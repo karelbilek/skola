@@ -12,6 +12,15 @@ get_opts_grid <- function(type) {
             mfinal = c(10,20,50,100,200)            
         ));
     }
+    if (type=="boosting") {
+        return (expand.grid( 
+            min_split = c( 10, 50, 100),
+            c_p = c( 0.01,0.05,0.2),
+            mfinal = c(10,50,100,200),            
+            boos = c(TRUE, FALSE),
+            coeflearn = c("Breiman", "Freund", "Zhu")
+        ));
+    }
 
     if (type=="DT") {
         return (expand.grid( 
@@ -63,6 +72,20 @@ custom_classifier <- function(type, formula, train_data, opts) {
 
 
     }
+    if (type=="boosting") {
+        control = rpart.control(
+            cp = as.numeric(opts["c_p"]),
+            minsplit = as.numeric(opts["min_split"])
+        )
+        classifier<-boosting(
+            formula,
+            data = train_data, 
+            mfinal = as.numeric(opts["mfinal"]),
+            boos = my_as_logical(opts["boos"]),
+            coeflearn = opts["coeflearn"]);
+    }
+
+
     if (type=="DT") {
         classifier<-rpart(
             formula, 
@@ -171,7 +194,7 @@ try <- function(train_range, test_range, features, type,tune, boost,
         formula <- as.formula(paste("semantic_class ~ ", paste(names, collapse= "+")))
         
 
-        if (type=="bagging") {
+        if (type=="bagging" | type=="boosting") {
            #this is absolutely weird, but R is weird, I can't help it
            #first, I make train_table into factor
 
@@ -183,22 +206,35 @@ try <- function(train_range, test_range, features, type,tune, boost,
             test_copy[, "semantic_class"] = 
                 factor(levels[0], levels=levels)
 
-            if (tune==0) {
-                classifier<-bagging(formula, train_table);
-            } else if (tune==2) {
-                classifier <- custom_classifier("bagging", formula,
-                                        train_table, custom_options);
+            if (type == "bagging") {
+                if (tune==0) {
+                    classifier<-bagging(formula, train_table);
+                } else if (tune==2) {
+                    classifier <- custom_classifier("bagging", formula,
+                                            train_table, custom_options);
 
+                }
+            
+
+
+                found_classes <- predict.bagging(classifier,
+                                    newdata = test_copy);
+            } else {
+                if (tune==0) {
+                    classifier<-boosting(formula, train_table);
+                } else if (tune==2) {
+                    classifier <- custom_classifier("boosting", formula,
+                                            train_table, custom_options);
+
+                }
+            
+
+
+                found_classes <- predict.boosting(classifier,
+                                    newdata = test_copy);
+ 
             }
-           
-
-
-            print("tu OK");
-            found_classes <- predict.bagging(classifier,
-                                newdata = test_copy);
-            print("tu OK 2");
             found_classes <- found_classes$class;
-            print("tu KO");
         }
 
         if (type=="DT") {
