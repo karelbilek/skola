@@ -207,9 +207,6 @@ try <- function(train_range, test_range, features, type,tune, boost,
             classifier <- naiveBayes(train_table[,-1], train_table[,1]);
             found_classes <- predict(classifier, test_copy,
                             type="class");
-            print(found_classes);          
-            print(correct_classes);
-            print("WTF"); 
         }
 
         if (type=="bagging" | type=="boosting") {
@@ -254,7 +251,6 @@ try <- function(train_range, test_range, features, type,tune, boost,
  
             }
             found_classes <- found_classes$class;
-            print(found_classes);
         }
 
         if (type=="DT") {
@@ -297,10 +293,8 @@ try <- function(train_range, test_range, features, type,tune, boost,
 
         }
        
-        print (correct_classes);
 
         same <- found_classes == correct_classes
-        print(same);
         correctness<- length(same[same])
         return(correctness/length(test_range))
 }
