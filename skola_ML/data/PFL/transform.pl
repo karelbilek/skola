@@ -4,6 +4,8 @@ use warnings;
 use Readonly;
 
 Readonly my $sloveso => $ARGV[0];
+Readonly my $treshold => $ARGV[1];
+Readonly my $should_print => ($ARGV[2] eq "yes");
 
 Readonly my %type_for_line=> qw(
     1 id
@@ -494,7 +496,6 @@ if (1 or ($ARGV[1]//"") eq "binary") {
     }
 }
 
-my $treshold = 3;
 #najit ty, co se nebudou brat, protoze jsou vsude stejne
 COLUMN:
 for my $column (2..$#head) {
@@ -551,6 +552,10 @@ for my $row (0..$#res) {
     print "\n";
 }
 
-my $count = 283 - scalar keys %not_printing;
+my $count = $#head - scalar keys %not_printing;
 use File::Slurp;
 write_file("current_results/feature_count", $count);
+
+if ($should_print) {
+   write_file("current_results/feature_took_final", "1 "x$count); 
+}

@@ -8,7 +8,7 @@ features_to_take <- scan("current_results/feature_took_final")
 result <- try(
             working_range, test_range,
                 features_to_take,
-           argument, 0,0
+           argument, 1,0
            );
  
 

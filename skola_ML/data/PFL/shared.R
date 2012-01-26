@@ -192,20 +192,24 @@ try <- function(train_range, test_range, features, type,tune, boost,
         names <- names(test_table_without_class)[features==1]
         
         formula <- as.formula(paste("semantic_class ~ ", paste(names, collapse= "+")))
-       
+      
+        formula <- as.formula("semantic_class ~ .");
         if (type=="bayes") {
             #no options
-#            train_table[, "semantic_class"] =
- #                  factor(train_table[,"semantic_class"]);
-#            levels = levels(train_table[, "semantic_class"])
+            levels = levels(all_table[, "semantic_class"])
+            train_table[, "semantic_class"] =
+                   factor(train_table[,"semantic_class"], levels=levels);
 
-  #          test_copy = test_table_without_class;
-   #         test_copy[, "semantic_class"] = 
-    #            factor(levels[0], levels=levels)
+           test_copy = test_table_without_class;
+           test_copy[, "semantic_class"] = 
+                factor(levels[0], levels=levels)
 
-            classifier <- naiveBayes(formula, train_table);
-            found_classes <- predict(classifier, test_table_without_class);
-            print(found_classes);            
+            classifier <- naiveBayes(train_table[,-1], train_table[,1]);
+            found_classes <- predict(classifier, test_copy,
+                            type="class");
+            print(found_classes);          
+            print(correct_classes);
+            print("WTF"); 
         }
 
         if (type=="bagging" | type=="boosting") {
@@ -292,8 +296,11 @@ try <- function(train_range, test_range, features, type,tune, boost,
             found_classes <- predict(classifier, test_table_without_class)
 
         }
-        
+       
+        print (correct_classes);
+
         same <- found_classes == correct_classes
+        print(same);
         correctness<- length(same[same])
         return(correctness/length(test_range))
 }
