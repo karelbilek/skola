@@ -554,7 +554,7 @@ for my $cycle_row (0..$#res) {
 
     for my $column (0..$#head) {
         if (!exists $not_printing{$column}){
-            if ($binary_as_YESNO) {
+            if ($binary_as_YESNO and $column>=2) {
                 my $yesno = $res[$row]->[$column] ? "YES" : "NO"; 
                 print $yesno."\t";
             } else {
