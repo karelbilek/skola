@@ -540,6 +540,13 @@ for my $column (2..$#head) {
     } 
 }
 
+for my $column (0..$#head) {
+    if (!exists $not_printing{$column}){
+        print $head[$column]."\t";
+    }
+}
+
+print "\n";
 
 for my $cycle_row (0..$#res) {
     my $row = $row_poradi{$cycle_row};
