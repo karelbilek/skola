@@ -12,8 +12,11 @@ sub run_sys {
 }
 
 for my $sloveso qw(ally arrive cry halt plough submit) { 
-    for my $type qw(bagging boosting SVM DT bayes) {
-        
+    #for my $type qw(bagging boosting SVM DT bayes) {
+    for my $type qw(bayes) {
+       
+        my $print_as_YESNO = ($type eq "bayes")? "yes" : "no";
+
         SEARCH_STYLE:
         for my $feature_search_style qw(evolution cut_2 cut_5 cut_10 cut_20
                                         cut_50 cut_70) {
@@ -23,7 +26,7 @@ for my $sloveso qw(ally arrive cry halt plough submit) {
                 next SEARCH_STYLE if ($type eq "bagging" or $type eq "boosting");
 
                 #first I have to process the files into all_data
-                run_sys("perl transform.pl $sloveso 3 no > current_results/all_data");
+                run_sys("perl transform.pl $sloveso 3 no $print_as_YESNO > current_results/all_data");
 
                 #then, I need to select the right feature vectors by running evolutionary
                 #algorithm
@@ -34,7 +37,8 @@ for my $sloveso qw(ally arrive cry halt plough submit) {
              } else {
                 
                 my ($cut_size) = $feature_search_style=~/cut_(.*)$/;
-                run_sys("perl transform.pl $sloveso $cut_size yes > current_results/all_data");
+                run_sys("perl transform.pl $sloveso $cut_size yes ".
+                        "$print_as_YESNO > current_results/all_data");
             }
 
             #0 - no tuning, simply try the default parameters

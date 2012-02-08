@@ -5,7 +5,9 @@ use Readonly;
 
 Readonly my $sloveso => $ARGV[0];
 Readonly my $treshold => $ARGV[1];
-Readonly my $should_print => ($ARGV[2] eq "yes");
+Readonly my $should_print_features_out => ($ARGV[2] eq "yes");
+Readonly my $binary_as_YESNO => (($ARGV[3] || "") eq "yes");
+
 Readonly my @row_poradi => qw(143 146 213 135 22 106 74 100 192 120 169 195 2
 87 10 36 104 39 37 208 248 45 91 221 218 202 190 172 184 215 239 170 44 49 26
 134 182 154 51 231 70 223 48 183 168 35 132 209 62 121 102 110 148 52 142 25
@@ -539,27 +541,17 @@ for my $column (2..$#head) {
 }
 
 
-my $demence=-1;
-for my $column (0..$#head) {
-    if (!exists $not_printing{$column}){
-        print $head[$column]."\t";
-        if ($head[$column] eq "is_POS_around_m2_8") {
-            #$demence = $column;
-        }
-    }
-}
-print "\n";
-
-
 for my $cycle_row (0..$#res) {
     my $row = $row_poradi{$cycle_row};
     if (!defined $row) {die "AAAA!!"};
 
     for my $column (0..$#head) {
         if (!exists $not_printing{$column}){
-            print $res[$row]->[$column]."\t";
-            if ($column == $demence) {
-                warn $res[$row]->[$column]."\n";
+            if ($binary_as_YESNO) {
+                my $yesno = $res[$row]->[$column] ? "YES" : "NO"; 
+                print $yesno."\t";
+            } else {
+                print $res[$row]->[$column]."\t";
             }
         }
     }
@@ -570,6 +562,6 @@ my $count = $#head - scalar keys %not_printing;
 use File::Slurp;
 write_file("current_results/feature_count", $count);
 
-if ($should_print) {
+if ($should_print_features_out) {
    write_file("current_results/feature_took_final", "1 "x$count); 
 }
