@@ -366,7 +366,7 @@ my %_semantic_class_of;
 sub semantic_class_of {
     my $what = shift;
     if (!scalar keys %_semantic_class_of) {
-        open my $inf, "<", "data/semantic-classes.wn.txt";
+        open my $inf, "<", "../data/semantic-classes.wn.txt";
         my $last_category=0;
         while (my $line = <$inf>) {
             chomp($line);
@@ -559,8 +559,5 @@ for my $cycle_row (0..$#res) {
     print "\n";
 }
 
-my $count = $#head - scalar keys %not_printing;
-use File::Slurp;
-write_file("current_results/feature_count", $count);
 
 
