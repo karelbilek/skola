@@ -1,0 +1,875 @@
+\documentclass{article}
+\setlength{\parindent}{0in}
+\setlength{\parskip}{0.1in}
+\setlength{\hoffset}{-1.8cm} 
+\setlength{\voffset}{-2cm}
+\setlength{\textheight}{24.0cm} 
+\setlength{\textwidth}{17cm}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\title{Introduction to ML - report on experiments}
+\date{}
+\begin{document}
+  \maketitle 
+  \section{Description of experiments}
+  
+  For machine learning experiments, I divided the data into two parts - the training and the heldout data.
+
+The heldout data were the last 30 lines, the training were the first 220 lines. The data were shuffled ``randomly" -- the word ``randomly" is in quotes, because I shuffled the array (1, 2, \dots 250) before conducting the experiment and I used the same shuffling everytime with every word.
+
+For features, I used just the features, recommended in the PDF. Which subset is to be used exactly is described further in this report.
+
+For all the words, I tried the following methods:
+
+\begin{itemize}
+  \item Naive Bayes classifier from R's \texttt{e1071} package
+\item Support Vector Machine classifier from the same package
+  \item Decision Tree classifier from the \texttt{rpart} package
+  \item Bagging from \texttt{adabag} package
+  \item Boosting from \texttt{adabag} package
+  
+\end{itemize}
+
+Now, Bagging and Boosting methods use I believe Decision Trees ``inside" them, but the \texttt{bagging} and \texttt{boosting} methods from adabag are to be used as a stand-alone classifiers, so I treated them as such. 
+
+For a feature selection, I first tried an evolutionary algorithm. Evolutionary algorithm are algorithms for optimizing some function (called \textit{ fitness}function in evolutionary algoritms) over a big solution space (called \textit{ population}), that's computationally hard to walk trough one by one; I thought that, taking all subsets of all features as a population and fitness function as a result of an experiment with this particular subset of features, evolutionary algorithm may work and give sufficiently good results.
+
+It turns out feature selection is -- at least in my experiments -- not a particularly good problem for evolutionary algorithm. The results don't really benefit from any type of crossover and are actually getting worse from generation to generation. Plus, it takes unnecessarily big amount of time.
+
+In Jan Václ's presentation, he talked about ignoring the features, that have the same value the whole time. I thought about taking it a bit further -- I tried to first transform all features into binary and then ignoring all the features, that have the lesser used value less than 5-times.
+
+The results were actually a bit better than using all the features. I called this ``feature cutting". This implicates a question, where exactly to ``cut" the features -- if we should cut it at 5, 20, 50\dots Again, cutting at 20 means ignoring the features where the lesser used value is used less than 20.
+
+I also found out that with parameter tuning, I got sometimes better results when doing the grid search \textit{myself} than with a built-in parameter tuning. So, I tried both parameter tuning myself (it's possible with everything except naive Bayes), built-in parameter tuning (only possible with DT and SVM) and default parameters.
+
+So, to summarize everything I wrote, for every word I tried the following:
+  \begin{itemize}
+\item 5 possible classifier methods
+\item for each of these, I tried for feature searching:
+
+  \begin{itemize}
+  \item  evolution algorithm, which returns 1 result for the best feature set 
+  \begin{itemize}
+\item for the algorithm to be quicker, I actually cut features even here at 3; the population are subsets of the set of features that has the lesser used value used more than 3 times
+\item a fitness value for this was a result of 11-fold cross validation on the training data, tried on the classifier method with the default parameters
+\item I skip evolution algoritm for bagging and boosting, since it simply
+takes too long
+  \end{itemize}
+\item cut the features at 5, 10, 20, 50 and 70 (arbitrarily chosen values) - this returns 5 feature sets, independent on the classifier method 
+
+  \begin{itemize}
+  \item 
+  this step is actually done in the script that transforms the input data into R-readable table, called \texttt{transform.pl}
+  \end{itemize}
+  \end{itemize}
+\item for each combination of 5 classifier method and 6 feature sets from the last step, I used 3 forms of parameter searching (where it makes sense)
+  \begin{itemize}
+\item first called 0 is no parameter searching
+\item second called 1 is built-in parameter searching
+\item lastly I implement my own grid-search, which is again 11-fold cross validation on the training data for every possible combination of parameters; I call that 2
+   \end{itemize}
+\end{itemize}
+
+After these all elaborate steps, I have exactly 73 classifiers for every verb.
+
+Originally, I thought I will take those 73 classifiers (which has not seen any of the ``heldout" data in any step), try them on the heldout data and take the best one in every verb as final. The results are shown below, as Results 1.
+
+However, I realized the resulting model might be too much over-fitted on the heldout data. Also, the results were the same for a lot of the best models. So, I thought about taking the best 20 models for every verb, once again cross-validating each of them -- this time on the whole data, disregarding the testing/heldout split, using 10-fold cross-validation. This was actually quick, because I skip the ``grid search" -- the parameters are already ``set in stone".
+
+To my surprise, what almost always ``won" this evaluation were bagging and boosting models, without any parameter tuning, with ``cut" features. The results indicate that evolutionary algorithm and custom parameter tuning may be still a bit overfitting. The results are shown below, as Results 2.
+
+I generalized a little here and decided to use \textbf{only} bagging and
+boosting for the ``final" model that I hand in as a result -- both for
+simplicity and for the fact that it generalizes nicely. 
+So, the final question is only whether to use bagging on boosting models in each case, and where exactly to cut the features. 
+
+As you probably noticed, nothing in this report is verb-specific; I tried
+everything for every verb. So, if I need to chose a specific verb, I am
+choosing the ones that got the best difference between the final, 10-fold
+cross validation test, and the baseline. So, in other words, verbs plough,
+submit and ally.
+
+   \section{Results}
+   The results are always the number of right assignment, divided by the number of all assignments. They are always sorted from the best to the worst.
+   \subsection{Results 1}
+   In all tables, PS means ``parameter search", lower means lower bound of 95\% confidence interval, upper means upper bound of 95\% confidence interval.
+   \clearpage\subsubsection{Ally}
+   Baseline is 0.7.
+   
+   { \tiny 
+   \begin{tabular}{| l |l| l|r |r|r|}
+   \hline
+   
+   
+   \textbf{method}& \textbf{feature selection} & \textbf{PS} & \textbf{result}& \textbf{lower} & \textbf{upper}\\ \hline
+ bagging & cut 10 & 2 & 0.9 & 0.7926464 & 1.0073536 \\ \hline
+bagging & cut 10 & 0 & 0.9 & 0.7926464 & 1.0073536 \\ \hline
+bagging & cut 5 & 2 & 0.9 & 0.7926464 & 1.0073536 \\ \hline
+SVM & evolution & 1 & 0.8666667 & 0.7450227 & 0.9883107 \\ \hline
+SVM & evolution & 0 & 0.8666667 & 0.7450227 & 0.9883107 \\ \hline
+SVM & cut 2 & 1 & 0.8666667 & 0.7450227 & 0.9883107 \\ \hline
+bagging & cut 2 & 2 & 0.8666667 & 0.7450227 & 0.9883107 \\ \hline
+bagging & cut 20 & 0 & 0.8666667 & 0.7450227 & 0.9883107 \\ \hline
+SVM & cut 2 & 0 & 0.8666667 & 0.7450227 & 0.9883107 \\ \hline
+bagging & cut 20 & 2 & 0.8666667 & 0.7450227 & 0.9883107 \\ \hline
+SVM & cut 2 & 2 & 0.8666667 & 0.7450227 & 0.9883107 \\ \hline
+bagging & cut 2 & 0 & 0.8666667 & 0.7450227 & 0.9883107 \\ \hline
+SVM & evolution & 2 & 0.8666667 & 0.7450227 & 0.9883107 \\ \hline
+SVM & cut 10 & 2 & 0.8333333 & 0.6999722 & 0.9666944 \\ \hline
+boosting & cut 10 & 0 & 0.8333333 & 0.6999722 & 0.9666944 \\ \hline
+boosting & cut 10 & 2 & 0.8333333 & 0.6999722 & 0.9666944 \\ \hline
+SVM & cut 5 & 0 & 0.8333333 & 0.6999722 & 0.9666944 \\ \hline
+SVM & cut 50 & 1 & 0.8333333 & 0.6999722 & 0.9666944 \\ \hline
+SVM & cut 70 & 1 & 0.8333333 & 0.6999722 & 0.9666944 \\ \hline
+bayes & evolution & 0 & 0.8333333 & 0.6999722 & 0.9666944 \\ \hline
+SVM & cut 50 & 0 & 0.8333333 & 0.6999722 & 0.9666944 \\ \hline
+SVM & cut 50 & 2 & 0.8333333 & 0.6999722 & 0.9666944 \\ \hline
+SVM & cut 70 & 0 & 0.8333333 & 0.6999722 & 0.9666944 \\ \hline
+bagging & cut 50 & 0 & 0.8333333 & 0.6999722 & 0.9666944 \\ \hline
+SVM & cut 5 & 2 & 0.8333333 & 0.6999722 & 0.9666944 \\ \hline
+SVM & cut 70 & 2 & 0.8333333 & 0.6999722 & 0.9666944 \\ \hline
+SVM & cut 5 & 1 & 0.8333333 & 0.6999722 & 0.9666944 \\ \hline
+boosting & cut 5 & 0 & 0.8333333 & 0.6999722 & 0.9666944 \\ \hline
+bagging & cut 5 & 0 & 0.8333333 & 0.6999722 & 0.9666944 \\ \hline
+bagging & cut 70 & 0 & 0.8333333 & 0.6999722 & 0.9666944 \\ \hline
+SVM & cut 10 & 0 & 0.8333333 & 0.6999722 & 0.9666944 \\ \hline
+bayes & cut 2 & 0 & 0.8333333 & 0.6999722 & 0.9666944 \\ \hline
+boosting & cut 5 & 2 & 0.8333333 & 0.6999722 & 0.9666944 \\ \hline
+SVM & cut 10 & 1 & 0.8333333 & 0.6999722 & 0.9666944 \\ \hline
+boosting & cut 50 & 0 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+boosting & cut 50 & 2 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+SVM & cut 20 & 1 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+boosting & cut 2 & 2 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+DT & cut 70 & 1 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+SVM & cut 20 & 2 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+DT & cut 70 & 0 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+SVM & cut 20 & 0 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+boosting & cut 20 & 2 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+bayes & cut 5 & 0 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+boosting & cut 20 & 0 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+boosting & cut 2 & 0 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+bayes & cut 70 & 0 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+DT & cut 70 & 2 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+DT & cut 50 & 1 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+bagging & cut 50 & 2 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+boosting & cut 70 & 2 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+DT & cut 50 & 2 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+bagging & cut 70 & 2 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+DT & cut 50 & 0 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+boosting & cut 70 & 0 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+DT & cut 20 & 1 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+bayes & cut 50 & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+DT & cut 20 & 2 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+bayes & cut 10 & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+DT & cut 20 & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+bayes & cut 20 & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+DT & evolution & 1 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+DT & evolution & 2 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+DT & cut 10 & 2 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+DT & cut 10 & 1 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+DT & evolution & 0 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+DT & cut 5 & 1 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+DT & cut 2 & 2 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+DT & cut 5 & 2 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+DT & cut 5 & 0 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+DT & cut 2 & 0 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+DT & cut 2 & 1 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+DT & cut 10 & 0 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+
+
+
+   \hline
+   \end{tabular} } 
+  \clearpage 
+   \subsubsection{Arrive}
+   Baseline is 0.5333333.
+   
+   { \tiny 
+   \begin{tabular}{| l |l| l|r |r|r|}
+   \hline
+   
+   \textbf{method}& \textbf{feature selection} & \textbf{PS} & \textbf{result}& \textbf{lower} & \textbf{upper}\\ \hline
+   boosting & cut 50 & 0 & 0.6333333 & 0.4608896 & 0.8057770 \\ \hline
+bayes & cut 70 & 0 & 0.6333333 & 0.4608896 & 0.8057770 \\ \hline
+boosting & cut 50 & 2 & 0.6333333 & 0.4608896 & 0.8057770 \\ \hline
+SVM & cut 50 & 0 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+boosting & cut 70 & 0 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+SVM & cut 50 & 2 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+bayes & cut 50 & 0 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+SVM & cut 70 & 2 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+DT & cut 70 & 2 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+bagging & cut 50 & 0 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+bagging & cut 70 & 0 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+bagging & cut 50 & 2 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+SVM & cut 70 & 0 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+SVM & cut 50 & 1 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+SVM & cut 70 & 1 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+DT & cut 20 & 2 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+DT & cut 50 & 2 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+bagging & cut 70 & 2 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+boosting & cut 70 & 2 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+boosting & cut 10 & 2 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+DT & cut 50 & 1 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+boosting & cut 2 & 2 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+bagging & cut 10 & 0 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+boosting & cut 5 & 0 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+SVM & cut 5 & 0 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+bagging & cut 5 & 0 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+DT & cut 50 & 0 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+bagging & cut 10 & 2 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+boosting & cut 20 & 0 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+boosting & cut 5 & 2 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+bayes & cut 20 & 0 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+SVM & cut 5 & 1 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+DT & cut 70 & 1 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+boosting & cut 2 & 0 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+bagging & cut 2 & 0 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+SVM & cut 5 & 2 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+boosting & cut 20 & 2 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+bayes & cut 10 & 0 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+DT & cut 70 & 0 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+bagging & cut 2 & 2 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+boosting & cut 10 & 0 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+SVM & evolution & 1 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+SVM & cut 20 & 1 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+DT & evolution & 2 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+SVM & evolution & 0 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+DT & cut 2 & 1 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+DT & cut 20 & 0 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+SVM & cut 10 & 2 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+DT & cut 2 & 2 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+DT & cut 10 & 0 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+SVM & cut 2 & 1 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+bagging & cut 20 & 2 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+SVM & cut 20 & 0 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+SVM & cut 10 & 0 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+DT & cut 20 & 1 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+SVM & cut 2 & 2 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+DT & evolution & 0 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+SVM & cut 10 & 1 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+bayes & evolution & 0 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+DT & cut 2 & 0 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+DT & cut 5 & 0 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+bagging & cut 20 & 0 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+bayes & cut 2 & 0 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+DT & cut 10 & 1 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+SVM & cut 20 & 2 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+DT & cut 5 & 2 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+SVM & evolution & 2 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+DT & evolution & 1 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+SVM & cut 2 & 0 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+DT & cut 5 & 1 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+bagging & cut 5 & 2 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+bayes & cut 5 & 0 & 0.5 & 0.3210773 & 0.6789227 \\ \hline
+DT & cut 10 & 2 & 0.4333333 & 0.2560082 & 0.6106584 \\ \hline
+
+
+   \hline
+   \end{tabular} } 
+  \clearpage 
+   \subsubsection{Cry}
+   Baseline is 0.4333333.
+   
+   { \tiny 
+   \begin{tabular}{| l |l| l|r |r|r|}
+   \hline
+   \textbf{method}& \textbf{feature selection} & \textbf{PS} & \textbf{result}& \textbf{lower} & \textbf{upper}\\ \hline
+   SVM & cut 50 & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+DT & cut 2 & 2 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+bayes & cut 5 & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 5 & 1 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 50 & 1 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+bayes & evolution & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+DT & cut 5 & 2 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 5 & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+DT & evolution & 2 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 50 & 2 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 5 & 2 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+boosting & cut 10 & 0 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+bagging & cut 50 & 0 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+SVM & cut 10 & 1 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+bayes & cut 10 & 0 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+DT & cut 10 & 2 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+boosting & cut 10 & 2 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+SVM & cut 20 & 1 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+boosting & cut 20 & 0 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+bagging & cut 10 & 0 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+bagging & cut 50 & 2 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+SVM & cut 20 & 2 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+boosting & cut 20 & 2 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+boosting & cut 5 & 2 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+SVM & cut 10 & 2 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+bagging & cut 10 & 2 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+boosting & cut 5 & 0 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+SVM & cut 20 & 0 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+SVM & cut 10 & 0 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+SVM & evolution & 2 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+bagging & cut 5 & 2 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+bayes & cut 20 & 0 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+boosting & cut 2 & 2 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+bagging & cut 20 & 0 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+bagging & cut 5 & 0 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+boosting & cut 50 & 2 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+SVM & evolution & 0 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+boosting & cut 50 & 0 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+DT & cut 20 & 2 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+SVM & evolution & 1 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+boosting & cut 2 & 0 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+bayes & cut 2 & 0 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+DT & cut 50 & 2 & 0.6333333 & 0.4608896 & 0.8057770 \\ \hline
+DT & cut 50 & 1 & 0.6333333 & 0.4608896 & 0.8057770 \\ \hline
+DT & cut 50 & 0 & 0.6333333 & 0.4608896 & 0.8057770 \\ \hline
+bagging & cut 20 & 2 & 0.6333333 & 0.4608896 & 0.8057770 \\ \hline
+bagging & cut 2 & 2 & 0.6333333 & 0.4608896 & 0.8057770 \\ \hline
+bagging & cut 2 & 0 & 0.6333333 & 0.4608896 & 0.8057770 \\ \hline
+DT & cut 10 & 1 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+DT & cut 20 & 1 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+DT & cut 20 & 0 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+bayes & cut 50 & 0 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+DT & cut 5 & 0 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+DT & evolution & 1 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+DT & cut 2 & 1 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+DT & cut 10 & 0 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+DT & cut 2 & 0 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+DT & cut 5 & 1 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+DT & evolution & 0 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+SVM & cut 2 & 0 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+SVM & cut 2 & 2 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+SVM & cut 2 & 1 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+bagging & cut 70 & 2 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+bayes & cut 70 & 0 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+boosting & cut 70 & 2 & 0.5 & 0.3210773 & 0.6789227 \\ \hline
+boosting & cut 70 & 0 & 0.5 & 0.3210773 & 0.6789227 \\ \hline
+bagging & cut 70 & 0 & 0.4333333 & 0.2560082 & 0.6106584 \\ \hline
+DT & cut 70 & 1 & 0.4333333 & 0.2560082 & 0.6106584 \\ \hline
+DT & cut 70 & 2 & 0.4333333 & 0.2560082 & 0.6106584 \\ \hline
+DT & cut 70 & 0 & 0.4333333 & 0.2560082 & 0.6106584 \\ \hline
+SVM & cut 70 & 0 & 0.4 & 0.2246923 & 0.5753077 \\ \hline
+SVM & cut 70 & 1 & 0.4 & 0.2246923 & 0.5753077 \\ \hline
+SVM & cut 70 & 2 & 0.4 & 0.2246923 & 0.5753077 \\ \hline
+
+   \hline
+   \end{tabular} } 
+  \clearpage 
+   \subsubsection{Halt}
+   Baseline is 0.7333333.
+   
+   { \tiny 
+   \begin{tabular}{| l |l| l|r |r|r|}
+   \hline
+   
+   \textbf{method}& \textbf{feature selection} & \textbf{PS} & \textbf{result}& \textbf{lower} & \textbf{upper}\\ \hline
+   boosting & cut 5 & 2 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+boosting & cut 10 & 0 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+boosting & cut 2 & 2 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+boosting & cut 10 & 2 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+bagging & cut 50 & 2 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+boosting & cut 20 & 2 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+boosting & cut 20 & 0 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+boosting & cut 5 & 0 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+boosting & cut 2 & 0 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+bagging & cut 50 & 0 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+bagging & cut 2 & 0 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+bagging & cut 20 & 2 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+boosting & cut 70 & 2 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+bagging & cut 5 & 0 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+bagging & cut 10 & 0 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+bagging & cut 5 & 2 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+bagging & cut 2 & 2 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+boosting & cut 50 & 2 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+bayes & cut 50 & 0 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+boosting & cut 70 & 0 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+boosting & cut 50 & 0 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+SVM & cut 2 & 1 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 50 & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+DT & cut 10 & 2 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 10 & 1 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 70 & 2 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & evolution & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 2 & 2 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+DT & cut 2 & 2 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+DT & cut 50 & 1 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+bagging & cut 20 & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+bagging & cut 10 & 2 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 70 & 1 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 5 & 1 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+DT & cut 20 & 1 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+DT & cut 10 & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+DT & cut 2 & 1 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+DT & cut 70 & 1 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 20 & 2 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+DT & cut 5 & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 50 & 1 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+DT & cut 2 & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+DT & evolution & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 20 & 1 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 2 & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+DT & cut 5 & 1 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 10 & 2 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+DT & evolution & 1 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 20 & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+DT & cut 50 & 2 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+DT & cut 20 & 2 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+DT & cut 5 & 2 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 5 & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & evolution & 1 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+bagging & cut 70 & 2 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+DT & evolution & 2 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 70 & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+bagging & cut 70 & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+DT & cut 20 & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 50 & 2 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+DT & cut 10 & 1 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 10 & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 5 & 2 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+DT & cut 70 & 2 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+DT & cut 70 & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & evolution & 2 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+DT & cut 50 & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+bayes & cut 2 & 0 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+bayes & cut 10 & 0 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+bayes & cut 5 & 0 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+bayes & evolution & 0 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+bayes & cut 70 & 0 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+bayes & cut 20 & 0 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+
+   
+   \hline
+   \end{tabular} } 
+  \clearpage 
+   \subsubsection{Plough}
+   Baseline is 0.3. (sic)
+   
+   { \tiny 
+   \begin{tabular}{| l |l| l|r |r|r|}
+   \hline
+   \textbf{method}& \textbf{feature selection} & \textbf{PS} & \textbf{result}& \textbf{lower} & \textbf{upper}\\ \hline
+   bagging & cut 5 & 0 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+boosting & cut 2 & 0 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+bagging & cut 5 & 2 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+boosting & cut 2 & 2 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+bagging & cut 10 & 0 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+boosting & cut 5 & 2 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+boosting & cut 5 & 0 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+boosting & cut 10 & 0 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+boosting & cut 10 & 2 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+bayes & cut 5 & 0 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+bagging & cut 2 & 2 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+bayes & evolution & 0 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+bagging & cut 2 & 0 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+bayes & cut 10 & 0 & 0.6333333 & 0.4608896 & 0.8057770 \\ \hline
+bagging & cut 10 & 2 & 0.6333333 & 0.4608896 & 0.8057770 \\ \hline
+bayes & cut 2 & 0 & 0.6333333 & 0.4608896 & 0.8057770 \\ \hline
+bagging & cut 20 & 0 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+boosting & cut 20 & 0 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+boosting & cut 20 & 2 & 0.6 & 0.4246923 & 0.7753077 \\ \hline
+SVM & cut 10 & 0 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+DT & evolution & 2 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+DT & cut 2 & 2 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+SVM & cut 20 & 1 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+SVM & cut 20 & 0 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+SVM & cut 10 & 2 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+SVM & cut 20 & 2 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+SVM & cut 10 & 1 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+DT & cut 20 & 2 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+DT & cut 5 & 2 & 0.5666667 & 0.3893416 & 0.7439918 \\ \hline
+DT & cut 2 & 1 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+DT & cut 10 & 2 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+DT & cut 20 & 0 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+DT & cut 10 & 0 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+bagging & cut 20 & 2 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+DT & cut 20 & 1 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+bayes & cut 20 & 0 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+DT & evolution & 0 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+DT & cut 2 & 0 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+DT & cut 5 & 0 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+DT & cut 10 & 1 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+DT & evolution & 1 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+DT & cut 5 & 1 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+boosting & cut 70 & 2 & 0.5 & 0.3210773 & 0.6789227 \\ \hline
+SVM & cut 5 & 1 & 0.5 & 0.3210773 & 0.6789227 \\ \hline
+SVM & cut 5 & 2 & 0.5 & 0.3210773 & 0.6789227 \\ \hline
+SVM & cut 5 & 0 & 0.5 & 0.3210773 & 0.6789227 \\ \hline
+boosting & cut 70 & 0 & 0.5 & 0.3210773 & 0.6789227 \\ \hline
+bayes & cut 50 & 0 & 0.4666667 & 0.2881420 & 0.6451914 \\ \hline
+SVM & evolution & 2 & 0.4666667 & 0.2881420 & 0.6451914 \\ \hline
+SVM & evolution & 1 & 0.4666667 & 0.2881420 & 0.6451914 \\ \hline
+SVM & evolution & 0 & 0.4666667 & 0.2881420 & 0.6451914 \\ \hline
+bagging & cut 50 & 2 & 0.4333333 & 0.2560082 & 0.6106584 \\ \hline
+SVM & cut 2 & 2 & 0.4333333 & 0.2560082 & 0.6106584 \\ \hline
+bagging & cut 70 & 2 & 0.4333333 & 0.2560082 & 0.6106584 \\ \hline
+SVM & cut 2 & 0 & 0.4333333 & 0.2560082 & 0.6106584 \\ \hline
+bayes & cut 70 & 0 & 0.4333333 & 0.2560082 & 0.6106584 \\ \hline
+SVM & cut 2 & 1 & 0.4333333 & 0.2560082 & 0.6106584 \\ \hline
+DT & cut 50 & 0 & 0.4 & 0.2246923 & 0.5753077 \\ \hline
+SVM & cut 50 & 2 & 0.4 & 0.2246923 & 0.5753077 \\ \hline
+bagging & cut 70 & 0 & 0.4 & 0.2246923 & 0.5753077 \\ \hline
+bagging & cut 50 & 0 & 0.4 & 0.2246923 & 0.5753077 \\ \hline
+DT & cut 70 & 2 & 0.4 & 0.2246923 & 0.5753077 \\ \hline
+DT & cut 50 & 1 & 0.4 & 0.2246923 & 0.5753077 \\ \hline
+SVM & cut 70 & 0 & 0.4 & 0.2246923 & 0.5753077 \\ \hline
+SVM & cut 70 & 1 & 0.4 & 0.2246923 & 0.5753077 \\ \hline
+SVM & cut 50 & 1 & 0.4 & 0.2246923 & 0.5753077 \\ \hline
+SVM & cut 50 & 0 & 0.4 & 0.2246923 & 0.5753077 \\ \hline
+boosting & cut 50 & 0 & 0.4 & 0.2246923 & 0.5753077 \\ \hline
+SVM & cut 70 & 2 & 0.4 & 0.2246923 & 0.5753077 \\ \hline
+boosting & cut 50 & 2 & 0.4 & 0.2246923 & 0.5753077 \\ \hline
+DT & cut 70 & 0 & 0.3666667 & 0.1942230 & 0.5391104 \\ \hline
+DT & cut 50 & 2 & 0.3666667 & 0.1942230 & 0.5391104 \\ \hline
+DT & cut 70 & 1 & 0.3666667 & 0.1942230 & 0.5391104 \\ \hline
+
+   
+   \hline
+   \end{tabular} } 
+  \clearpage 
+   \subsubsection{Submit}
+   Baseline is 0.6666667.
+   
+   { \tiny 
+   \begin{tabular}{| l |l| l|r |r|r|}
+   \hline
+   
+   \textbf{method}& \textbf{feature selection} & \textbf{PS} & \textbf{result}& \textbf{lower} & \textbf{upper}\\ \hline
+   DT & cut 10 & 0 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+bagging & cut 10 & 0 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+bagging & cut 20 & 0 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+DT & cut 50 & 1 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+DT & cut 50 & 0 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+DT & cut 20 & 2 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+bagging & cut 50 & 0 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+bagging & cut 5 & 0 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+DT & cut 20 & 1 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+bagging & cut 2 & 2 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+bagging & cut 20 & 2 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+DT & evolution & 1 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+DT & cut 2 & 1 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+DT & evolution & 0 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+bagging & cut 50 & 2 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+DT & cut 10 & 2 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+bagging & cut 10 & 2 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+bagging & cut 2 & 0 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+DT & cut 50 & 2 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+DT & cut 5 & 1 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+DT & cut 20 & 0 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+DT & cut 2 & 0 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+DT & cut 10 & 1 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+DT & cut 5 & 0 & 0.8 & 0.6568618 & 0.9431382 \\ \hline
+boosting & cut 5 & 0 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+SVM & cut 5 & 1 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+DT & cut 70 & 2 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+DT & cut 70 & 0 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+bagging & cut 70 & 0 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+SVM & cut 50 & 1 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+DT & cut 5 & 2 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+boosting & cut 10 & 2 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+DT & cut 2 & 2 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+boosting & cut 2 & 0 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+SVM & evolution & 2 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+DT & cut 70 & 1 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+SVM & cut 2 & 1 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+SVM & evolution & 0 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+boosting & cut 2 & 2 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+SVM & cut 50 & 0 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+SVM & cut 50 & 2 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+bagging & cut 5 & 2 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+boosting & cut 10 & 0 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+boosting & cut 20 & 2 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+SVM & cut 2 & 2 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+SVM & evolution & 1 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+DT & evolution & 2 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+SVM & cut 5 & 2 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+boosting & cut 5 & 2 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+boosting & cut 20 & 0 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+SVM & cut 2 & 0 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+SVM & cut 5 & 0 & 0.7666667 & 0.6153151 & 0.9180183 \\ \hline
+bayes & cut 2 & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 10 & 1 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 20 & 2 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 20 & 1 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 10 & 2 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+bayes & evolution & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 20 & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+bagging & cut 70 & 2 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 10 & 0 & 0.7333333 & 0.5750881 & 0.8915785 \\ \hline
+SVM & cut 70 & 1 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+SVM & cut 70 & 2 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+bayes & cut 70 & 0 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+boosting & cut 50 & 0 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+boosting & cut 70 & 0 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+boosting & cut 50 & 2 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+boosting & cut 70 & 2 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+SVM & cut 70 & 0 & 0.7 & 0.5360146 & 0.8639854 \\ \hline
+bayes & cut 20 & 0 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+bayes & cut 5 & 0 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+bayes & cut 10 & 0 & 0.6666667 & 0.4979768 & 0.8353566 \\ \hline
+bayes & cut 50 & 0 & 0.5333333 & 0.3548086 & 0.7118580 \\ \hline
+   
+   \hline
+   \end{tabular} }
+
+\subsection{Results 2}
+Since these results are 10-fold cross validation, I am not sure how to cound the
+confidence intervals in these; the baseline is counted for every one of the 10
+trials in 10-fold validations separately and then averaged as in 10-fold cross
+validation.
+
+The model I chose for final handing in is in italics.
+
+\clearpage
+
+\subsubsection{Ally}
+  Baseline is 0.476.
+   
+ Note: this is the only model that, in final form, does use custom parameters. 
+     
+   \begin{tabular}{| l |l| l|r |}
+   \hline
+   
+   \textbf{method}& \textbf{feature selection} & \textbf{PS} & \textbf{result} \\ \hline
+\textit{bagging} & \textit{cut 20} & \textit{2} & \textit{0.652} \\ \hline
+boosting & cut 10 & 0 & 0.648\\ \hline
+bagging & cut 20 & 0 & 0.644\\ \hline
+SVM & evolution & 2 & 0.644\\ \hline
+bagging & cut 2 & 0 & 0.644\\ \hline
+bayes & cut 2 & 0 & 0.632\\ \hline
+boosting & cut 10 & 2 & 0.632\\ \hline
+boosting & cut 5 & 0 & 0.632\\ \hline
+SVM & evolution & 1 & 0.632\\ \hline
+SVM & cut 2 & 2 & 0.632\\ \hline
+bagging & cut 10 & 0 & 0.632\\ \hline
+SVM & evolution & 0 & 0.632\\ \hline
+bayes & evolution & 0 & 0.628\\ \hline
+bagging & cut 2 & 2 & 0.62\\ \hline
+bagging & cut 5 & 2 & 0.62\\ \hline
+SVM & cut 2 & 0 & 0.604\\ \hline
+boosting & cut 5 & 2 & 0.604\\ \hline
+SVM & cut 2 & 1 & 0.604\\ \hline
+bagging & cut 70 & 0 & 0.6\\ \hline
+bagging & cut 10 & 2 & 0.6\\ \hline
+  \end{tabular}
+
+\clearpage 
+
+\subsubsection{Arrive}
+  Baseline is 0.68.
+   
+     
+   \begin{tabular}{| l |l| l|r |}
+   \hline
+   
+   \textbf{method}& \textbf{feature selection} & \textbf{PS} & \textbf{result} \\ \hline
+   
+  \textit{boosting} & \textit{cut 50} & \textit{0} & \textit{0.716}\\ \hline
+  SVM & cut 70 & 0 & 0.712\\ \hline
+  SVM & cut 50 & 2 & 0.712\\ \hline
+  SVM & cut 70 & 1 & 0.712\\ \hline
+  boosting & cut 70 & 0 & 0.704\\ \hline
+  bagging & cut 70 & 2 & 0.704\\ \hline
+  bagging & cut 70 & 0 & 0.704\\ \hline
+  bagging & cut 50 & 0 & 0.704\\ \hline
+  SVM & cut 70 & 2 & 0.704\\ \hline
+  bagging & cut 50 & 2 & 0.7\\ \hline
+  SVM & cut 50 & 0 & 0.696\\ \hline
+  SVM & cut 50 & 1 & 0.696\\ \hline
+  DT & cut 70 & 2 & 0.688\\ \hline
+  DT & cut 50 & 2 & 0.684\\ \hline
+  bayes & cut 70 & 0 & 0.676\\ \hline
+  boosting & cut 70 & 2 & 0.676\\ \hline
+  bayes & cut 50 & 0 & 0.66\\ \hline
+  boosting & cut 5 & 2 & 0.64\\ \hline
+  DT & cut 20 & 2 & 0.64\\ \hline
+  boosting & cut 50 & 2 & 0.6\\ \hline
+  \end{tabular}
+  
+
+\clearpage 
+
+\subsubsection{Cry}
+  Baseline is 0.524.
+   
+     
+   \begin{tabular}{| l |l| l|r |}
+   \hline
+   
+   \textbf{method}& \textbf{feature selection} & \textbf{PS} & \textbf{result} \\ \hline
+  bayes & cut 5 & 0 & 0.676\\ \hline
+  SVM & cut 50 & 2 & 0.676\\ \hline
+  bayes & evolution & 0 & 0.676\\ \hline
+  \textit{boosting} & \textit{cut 5} & \textit{0} & \textit{0.668} \\ \hline
+  boosting & cut 20 & 2 & 0.668\\ \hline
+  bayes & cut 10 & 0 & 0.664\\ \hline
+  boosting & cut 10 & 0 & 0.66\\ \hline
+  boosting & cut 20 & 0 & 0.66\\ \hline
+  boosting & cut 10 & 2 & 0.66\\ \hline
+  SVM & cut 5 & 0 & 0.652\\ \hline
+  SVM & cut 5 & 1 & 0.652\\ \hline
+  SVM & cut 50 & 1 & 0.632\\ \hline
+  SVM & cut 50 & 0 & 0.632\\ \hline
+  SVM & cut 5 & 2 & 0.632\\ \hline
+  DT & evolution & 2 & 0.624\\ \hline
+  DT & cut 2 & 2 & 0.624\\ \hline
+  DT & cut 5 & 2 & 0.624\\ \hline
+  boosting & cut 5 & 2 & 0.624\\ \hline
+  bagging & cut 50 & 0 & 0.604\\ \hline
+  bagging & cut 50 & 2 & 0.596\\ \hline
+
+ \end{tabular}
+  
+
+\clearpage 
+\subsubsection{Halt}
+  Baseline is 0.836.
+   
+     
+   \begin{tabular}{| l |l| l|r |}
+   \hline
+   
+   \textbf{method}& \textbf{feature selection} & \textbf{PS} & \textbf{result} \\ \hline
+\textit{bagging} & \textit{cut 2} & \textit{0} & \textit{0.844} \\ \hline
+bagging & cut 2 & 2 & 0.844\\ \hline
+bagging & cut 5 & 0 & 0.84\\ \hline
+bagging & cut 5 & 2 & 0.84\\ \hline
+bagging & cut 20 & 2 & 0.836\\ \hline
+boosting & cut 70 & 0 & 0.832\\ \hline
+boosting & cut 50 & 2 & 0.832\\ \hline
+boosting & cut 20 & 0 & 0.828\\ \hline
+boosting & cut 2 & 2 & 0.828\\ \hline
+boosting & cut 10 & 0 & 0.828\\ \hline
+boosting & cut 70 & 2 & 0.828\\ \hline
+bagging & cut 50 & 2 & 0.828\\ \hline
+boosting & cut 5 & 0 & 0.824\\ \hline
+bagging & cut 50 & 0 & 0.824\\ \hline
+boosting & cut 20 & 2 & 0.824\\ \hline
+boosting & cut 10 & 2 & 0.816\\ \hline
+boosting & cut 2 & 0 & 0.816\\ \hline
+boosting & cut 50 & 0 & 0.796\\ \hline
+bayes & cut 50 & 0 & 0.704\\ \hline
+boosting & cut 5 & 2 & 0.604\\ \hline
+
+
+ \end{tabular}
+
+\clearpage 
+\subsubsection{Plough}
+  Baseline is 0.324.
+   
+     
+   \begin{tabular}{| l |l| l|r |}
+   \hline
+   
+   \textbf{method}& \textbf{feature selection} & \textbf{PS} & \textbf{result} \\ \hline
+\textit{boosting} & \textit{cut 5} & \textit{2} & \textit{0.844}\\ \hline
+bagging & cut 5 & 2 & 0.576\\ \hline
+bagging & cut 10 & 0 & 0.568\\ \hline
+boosting & cut 2 & 2 & 0.568\\ \hline
+boosting & cut 10 & 2 & 0.568\\ \hline
+boosting & cut 5 & 0 & 0.568\\ \hline
+bagging & cut 5 & 0 & 0.568\\ \hline
+bagging & cut 2 & 2 & 0.568\\ \hline
+boosting & cut 2 & 0 & 0.564\\ \hline
+bagging & cut 2 & 0 & 0.56\\ \hline
+boosting & cut 10 & 0 & 0.56\\ \hline
+boosting & cut 20 & 0 & 0.556\\ \hline
+bagging & cut 10 & 2 & 0.548\\ \hline
+boosting & cut 20 & 2 & 0.548\\ \hline
+bagging & cut 20 & 0 & 0.54\\ \hline
+SVM & cut 20 & 2 & 0.54\\ \hline
+bayes & cut 2 & 0 & 0.536\\ \hline
+bayes & evolution & 0 & 0.536\\ \hline
+bayes & cut 5 & 0 & 0.528\\ \hline
+bayes & cut 10 & 0 & 0.524\\ \hline
+\end{tabular}
+\subsubsection{Submit}
+  Baseline is 0.708.
+   
+     
+   \begin{tabular}{| l |l| l|r |}
+   \hline
+   
+   \textbf{method}& \textbf{feature selection} & \textbf{PS} & \textbf{result} \\ \hline
+
+\textit{bagging} & \textit{cut 2} & \textit{0} & \textit{0.864}\\ \hline
+bagging & cut 10 & 0 & 0.864\\ \hline
+bagging & cut 5 & 0 & 0.864\\ \hline
+bagging & cut 20 & 0 & 0.864\\ \hline
+bagging & cut 2 & 2 & 0.86\\ \hline
+bagging & cut 10 & 2 & 0.86\\ \hline
+DT & cut 2 & 1 & 0.856\\ \hline
+DT & evolution & 0 & 0.856\\ \hline
+DT & cut 5 & 0 & 0.856\\ \hline
+DT & cut 20 & 1 & 0.856\\ \hline
+DT & evolution & 1 & 0.856\\ \hline
+DT & cut 5 & 1 & 0.856\\ \hline
+DT & cut 20 & 0 & 0.856\\ \hline
+DT & cut 20 & 2 & 0.84\\ \hline
+bagging & cut 20 & 2 & 0.84\\ \hline
+bagging & cut 50 & 2 & 0.832\\ \hline
+bagging & cut 50 & 0 & 0.828\\ \hline
+DT & cut 50 & 1 & 0.824\\ \hline
+DT & cut 50 & 0 & 0.824\\ \hline
+DT & cut 50 & 2 & 0.816\\ \hline
+
+\end{tabular}
+
+
+\section{Description of the files}
+\subsection{Final models}
+All the final models are in the directory \texttt{hotovo}. To run the model,
+you need to run something like following in bash:
+
+\texttt{perl do.pl ../data/development.instances/ally.txt
+../data/test.instances/ally.txt ally}
+
+Where the first argument is address to the train file, the second is address
+to test file, the thirs is the verb.
+
+The script runs \texttt{transform.pl} to transform the instances into a table,
+readable by R. Then it runs the \texttt{train\_and\_test} file, which trains
+the model and test it on the example data, writing out the result of the test.
+
+\subsection{Other files}
+In \texttt{current\_results}, there are intermediate results that are needed
+for the training, but can be deleted at any time when no intermediate models
+are trained.
+
+In \texttt{results} directory, there are results that are needed for
+comparison of models, and also a particular feature sets/tuned parameters.
+
+Scripts \texttt{baseline.pl} and \texttt{baseline.R} show a baseline (for Results 1) for any given
+verb.
+
+Script \texttt{complete.pl} does all the possible combinations of
+verb/parameter search/feature search.
+
+\texttt{evoluce.pl} and \texttt{evolution\_try.R} are for evolutionary
+algorithm.
+
+\texttt{jednoduchy\_try.R} is for simple trying of model with no parameter
+search.
+
+\texttt{muj\_grid\_search.R} and \texttt{muj\_grid\_search} are implementing
+my own grid searcg of parameters.
+
+\texttt{napis\_secres.pl} is showing results of the second, 10-fold crossover
+experiments in a somehow nice way; \texttt{napis\_vysledky.pl} is showing
+results of the first experiments in a somehow nice way. The same files with
+\texttt{\_latex} are exporting it in a latex table.
+
+\texttt{report.latex} is this report in latex.
+
+\texttt{second\_baseline.pl} and \texttt{.R} is showing baseline of the second
+set of experiments.
+
+\texttt{second\_evaluation.pl} and \texttt{.R} are doing the second sets of
+experiments.
+
+\texttt{shared.R} is a file with everything ``important" -- all the possible
+models are defined there and are just called from other \texttt{.R} files via
+a procedure, called \texttt{try}.
+
+\texttt{transform.pl} is doing the transformation of the data file to R
+matrix.
+
+
+
+\end{document}
