@@ -27,8 +27,8 @@ more_tries <- function(opts) {
             );
    }
 
-    print (average_correctness/10);
-   return(average_correctness/10)
+    print (average_correctness/11);
+   return(average_correctness/11)
 }
 
 

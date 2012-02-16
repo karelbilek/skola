@@ -1,29 +1,20 @@
-library(rpart)
+argument <- commandArgs(trailingOnly = TRUE);
+source("shared.R");
+working_range<- 1:220
+test_range<- 221:250
 
-all_table<-read.table("all_data")
-
-working_table<-all_table[1:220,]
-test_table<-all_table[221:250,]
-
-
+features_to_take <- scan("current_results/feature_took_final")
 
 
-    correctness <- 0
+result <- try(
+            working_range, test_range,
+                features_to_take,
+           "baseline", 0,0
+           );
+ 
 
+print(result)
 
-
-        test_table_without_class <- test_table[, -1]
-        correct_classes <- test_table[, 1]
-       
-        most_freq <- which.max(table(working_table[,1]))
-      
-        max(table(working_table[,1]))
-        which.max(table(working_table[,1]))
-        working_table[,1]
-
-        same <- most_freq == correct_classes
-        correctness<-correctness + length(same[same])
-
-    correctness/30
-
-write(correctness/30, "baseline_result")
+se<-sqrt(result*(1-result)/30)
+print (result-1.96*se)
+print (result+1.96*se)

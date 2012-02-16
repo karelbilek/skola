@@ -12,8 +12,7 @@ sub run_sys {
 }
 
 for my $sloveso qw(ally arrive cry halt plough submit) { 
-    #for my $type qw(bagging boosting SVM DT bayes) {
-    for my $type qw(bayes) {
+    for my $type qw(bagging boosting SVM DT bayes) {
        
         my $print_as_YESNO = ($type eq "bayes")? "yes" : "no";
 
@@ -37,9 +36,12 @@ for my $sloveso qw(ally arrive cry halt plough submit) {
              } else {
                 
                 my ($cut_size) = $feature_search_style=~/cut_(.*)$/;
+            
                 run_sys("perl transform.pl $sloveso $cut_size yes ".
-                        "$print_as_YESNO > current_results/all_data");
-            }
+                                "$print_as_YESNO > current_results/all_data");
+
+               
+             }
 
             #0 - no tuning, simply try the default parameters
             #1 - default tuning (with svm and rpart)
@@ -49,7 +51,7 @@ for my $sloveso qw(ally arrive cry halt plough submit) {
                 if ($param_tune_style == 0) {                
                     run_sys("R --no-save --args $type < jednoduchy_try.R");
                 } elsif ($param_tune_style == 1) {
-                    next TUNE_STYLE if ($type ne "SVT" and $type ne "DT");
+                    next TUNE_STYLE if ($type ne "SVM" and $type ne "DT");
 
                     run_sys("R --no-save --args $type < easytune_try.R");
                 } else {
@@ -62,8 +64,6 @@ for my $sloveso qw(ally arrive cry halt plough submit) {
                     #and, in the end, I just use the found parameters to one final testing
                     run_sys("R --no-save --args $type < muj_grid_final.R");
                     
-                    run_sys ("cp current_results/best_options ".
-                        "results/$type.$feature_search_style.options.$sloveso");
     
                 }
 

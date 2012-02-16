@@ -194,6 +194,12 @@ try <- function(train_range, test_range, features, type,tune, boost,
         formula <- as.formula(paste("semantic_class ~ ", paste(names, collapse= "+")))
       
         formula <- as.formula("semantic_class ~ .");
+        if (type=="baseline") {
+       
+            most_freq <- which.max(table(train_table[,1]))
+            found_classes <- rep(most_freq, length(correct_classes))
+ 
+        }
         if (type=="bayes") {
             #no options
             levels = levels(all_table[, "semantic_class"])
