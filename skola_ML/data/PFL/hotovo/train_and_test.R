@@ -44,7 +44,7 @@ if (type == "bagging") {
             boos = TRUE,
             coeflearn = "Breiman");
 
-    else {
+    } else {
         classifier<-boosting("semantic_class ~ .", train_table);
     }
 
@@ -60,5 +60,7 @@ same <- found_classes == correct_classes
 correctness<- length(same[same])
         
 res <- (correctness/length(same))
+
+found_classes;
 
 res
