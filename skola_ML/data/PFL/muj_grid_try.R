@@ -29,5 +29,5 @@ errors <- results[2,];
 best<-which.max(means);
 
 write.table(opts_grid[best,], "current_results/best_options");
-write(max(means), "current_results/test_result");
+write(c(max(means), errors[best]), "current_results/test_result");
 
