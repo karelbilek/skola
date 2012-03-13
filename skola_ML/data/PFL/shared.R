@@ -120,7 +120,8 @@ custom_classifier <- function(type, formula, train_data, opts) {
                             scale = my_as_logical(opts["scale"]),
                             cost = as.numeric(opts["cost"]),
                             shrinking = my_as_logical(opts["shrinking"]),
-                            probability = my_as_logical(opts["probability"]))
+                            probability = my_as_logical(opts["probability"]),
+                            kernel = "linear")
             
         }
         if (opts["kernel"]=="polynomial") {
@@ -132,7 +133,8 @@ custom_classifier <- function(type, formula, train_data, opts) {
                                 shrinking = my_as_logical(opts["shrinking"]),
                                 coef0 = as.numeric(opts["coef0"]),
                                 probability = my_as_logical(opts["probability"]),
-                                degree = as.numeric(opts["degree"]))
+                                degree = as.numeric(opts["degree"]),
+                                kernel="polynomial")
              } else {
                 classifier <- svm(formula,
                                 data=train_data,
@@ -142,7 +144,8 @@ custom_classifier <- function(type, formula, train_data, opts) {
                                 coef0 = as.numeric(opts["coef0"]),
                                 probability = my_as_logical(opts["probability"]),
                                 gamma = as.numeric(opts["gamma"]),
-                                degree = as.numeric(opts["degree"]))
+                                degree = as.numeric(opts["degree"])
+                                kernel = "polynomial")
              }
         }
         if (opts["kernel"]=="radial basis") {
@@ -153,7 +156,8 @@ custom_classifier <- function(type, formula, train_data, opts) {
                                 cost = as.numeric(opts["cost"]),
                                 shrinking = my_as_logical(opts["shrinking"]),
                                 probability = my_as_logical(opts["probability"]),
-                                degree = as.numeric(opts["degree"]))
+                                degree = as.numeric(opts["degree"]),
+                                kernel = "radial basis")
              } else {
                 classifier <- svm(formula,
                                 data=train_data,
@@ -162,10 +166,11 @@ custom_classifier <- function(type, formula, train_data, opts) {
                                 shrinking = my_as_logical(opts["shrinking"]),
                                 probability = my_as_logical(opts["probability"]),
                                 gamma = as.numeric(opts["gamma"]),
-                                degree = as.numeric(opts["degree"]))
+                                degree = as.numeric(opts["degree"]),
+                                kernel = "radial basis")
              }
         }    
-        if (opts["kernel"]=="") {
+        if (opts["kernel"]=="sigmoid") {
             if (opts["gamma"]==0) {
                 classifier <- svm(formula,
                                 data=train_data,
@@ -173,7 +178,8 @@ custom_classifier <- function(type, formula, train_data, opts) {
                                 cost = as.numeric(opts["cost"]),
                                 shrinking = my_as_logical(opts["shrinking"]),
                                 probability = my_as_logical(opts["probability"]),
-                                degree = as.numeric(opts["degree"]))
+                                degree = as.numeric(opts["degree"]),
+                                kernel="sigmoid")
              } else {
                 classifier <- svm(formula,
                                 data=train_data,
@@ -181,7 +187,8 @@ custom_classifier <- function(type, formula, train_data, opts) {
                                 cost = as.numeric(opts["cost"]),
                                 shrinking = my_as_logical(opts["shrinking"]),
                                 probability = my_as_logical(opts["probability"]),
-                                gamma = as.numeric(opts["gamma"]));
+                                gamma = as.numeric(opts["gamma"])
+                                kernel = "sigmoid");
              }
         }
      }
