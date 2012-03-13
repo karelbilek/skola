@@ -1,12 +1,9 @@
 argument <- commandArgs(trailingOnly = TRUE);
 source("shared.R");
-working_range<- 1:220
-test_range<- 221:250
 
 features_to_take <- scan("current_results/feature_took_final")
 
-result <- try(
-            working_range, test_range,
+result <- more_tries(
                 features_to_take,
            argument, 0,0
            );

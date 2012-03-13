@@ -184,6 +184,39 @@ custom_classifier <- function(type, formula, train_data, opts) {
         return (classifier);
 }
 
+more_tries <- function(features_to_take, type, tune, boost, opts) {
+   average_correctness <- 0
+  
+    working_range <- 1:250;
+
+
+    results <- c();
+
+#pomohl jsem si http://www.cyclismo.org/tutorial/R/confidence.html#t
+   
+   for (cross_validation_number in (0:9)) {
+        print(cross_validation_number);
+        starting_line<-cross_validation_number*25+1;
+        ending_line<-starting_line+24;
+        
+        results <- c( results,
+            try(
+                working_range[ -starting_line : -ending_line],
+                working_range[ starting_line : ending_line],
+                features_to_take,
+                type, tune, boost, 
+                opts
+            ));
+   }
+
+   m<-mean(results);
+   error <- qt(0.975,df=length(results)-1)*sd(results)/sqrt(length(results));
+
+
+   return(c(m,error));
+}
+
+
 try <- function(train_range, test_range, features, type,tune, boost,
                 custom_options=NULL) {
         test_table_without_class <- all_table[test_range, -1]
