@@ -167,7 +167,7 @@ custom_classifier <- function(type, formula, train_data, opts) {
                                 probability = my_as_logical(opts["probability"]),
                                 gamma = as.numeric(opts["gamma"]),
                                 degree = as.numeric(opts["degree"]),
-                                kernel = "radial basis")
+                                kernel = "radial")
              }
         }    
         if (opts["kernel"]=="sigmoid") {
