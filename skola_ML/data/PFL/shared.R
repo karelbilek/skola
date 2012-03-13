@@ -144,7 +144,7 @@ custom_classifier <- function(type, formula, train_data, opts) {
                                 coef0 = as.numeric(opts["coef0"]),
                                 probability = my_as_logical(opts["probability"]),
                                 gamma = as.numeric(opts["gamma"]),
-                                degree = as.numeric(opts["degree"])
+                                degree = as.numeric(opts["degree"]),
                                 kernel = "polynomial")
              }
         }
@@ -187,7 +187,7 @@ custom_classifier <- function(type, formula, train_data, opts) {
                                 cost = as.numeric(opts["cost"]),
                                 shrinking = my_as_logical(opts["shrinking"]),
                                 probability = my_as_logical(opts["probability"]),
-                                gamma = as.numeric(opts["gamma"])
+                                gamma = as.numeric(opts["gamma"]),
                                 kernel = "sigmoid");
              }
         }
