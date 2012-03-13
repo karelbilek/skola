@@ -35,9 +35,9 @@ get_opts_grid <- function(type) {
             scale = c(TRUE, FALSE),
             kernel = c("linear", "polynomial", "radial basis", "sigmoid"),
             degree = c(1,2,3),
-            gamma = c(0, 1/50,1/20,1/10, 1/5, 1/2),
-            coef0 = c(0,1,2,5,10,20),
-            cost = c(0.1,0.2,0.5,1),
+            gamma = c(0, 1/50,1/10, 1/5, 1/2),
+            coef0 = c(0,1,5,10,20),
+            cost = c(0.1,0.5,1),
             shrinking = c(TRUE,FALSE),
             probability = c(TRUE,FALSE)
         ))
