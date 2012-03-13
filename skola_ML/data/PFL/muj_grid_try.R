@@ -11,8 +11,8 @@ opts_grid <- get_opts_grid(argument)
 pokus <-1
 do_more_tries <- function(opts) {
     pokus<--pokus+1
-    write("pokus");
-    write(pokus);
+    print("pokus");
+    print(pokus);
     return(more_tries(features_to_take, argument, 2, 0, opts));
 }
 
