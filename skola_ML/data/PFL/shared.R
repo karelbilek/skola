@@ -60,6 +60,11 @@ my_as_logical<-function(string) {
 }
 
 custom_classifier <- function(type, formula, train_data, opts) {
+
+    print("====custom===");
+    print(type);
+    print(formula);
+    print(opts);
     if (type=="bagging") {
         control = rpart.control(
             cp = as.numeric(opts["c_p"]),
