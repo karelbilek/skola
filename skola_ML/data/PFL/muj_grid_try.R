@@ -8,7 +8,11 @@ features_to_take <- scan("current_results/feature_took_final")
 
 opts_grid <- get_opts_grid(argument)
 
+pokus <-1
 do_more_tries <- function(opts) {
+    pokus<--pokus+1
+    write("pokus");
+    write(pokus);
     return(more_tries(features_to_take, argument, 2, 0, opts));
 }
 
