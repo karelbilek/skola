@@ -7,14 +7,20 @@ source("shared.R");
 features_to_take <- scan("current_results/feature_took_final")
 
 opts_grid <- get_opts_grid(argument)
+gridsize <- length(opts_grid[,1])
 
 pokus <-1
 do_more_tries <- function(opts) {
     pokus<<-pokus+1
     print("pokus");
+    
     print(pokus);
+    print("ze");
+    print(gridsize)
     return(more_tries(features_to_take, argument, 2, 0, opts));
 }
+
+
 
 results <- apply(opts_grid, 1, do_more_tries);
 means <- results[1,];
