@@ -47,7 +47,7 @@ for my $sloveso qw(ally arrive cry halt plough submit) {
             run_sys ("cp current_results/best_options results/$type.muj_search.opts.$sloveso");
                #die "here"; 
         }
-        die "gere";
+        #die "gere";
 
     }
 }
