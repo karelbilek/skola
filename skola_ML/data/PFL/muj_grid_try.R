@@ -9,7 +9,7 @@ features_to_take <- scan("current_results/feature_took_final")
 opts_grid <- get_opts_grid(argument)
 
 do_more_tries <- function(opts) {
-    return(more_tries(opts));
+    return(more_tries(argument, 2, 0, opts));
 }
 
 results <- apply(opts_grid, 1, do_more_tries);
