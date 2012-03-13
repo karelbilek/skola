@@ -14,8 +14,10 @@ sub run_sys {
 #my $sloveso = $ARGV[0];
 #{
 for my $sloveso qw(ally arrive cry halt plough submit) { 
+    TYPE:
     for my $type qw(SVM bayes bagging boosting DT) {
-       
+        next $type if ($sloveso eq "ally" and $type ne "DT");
+
         my $print_as_YESNO = ($type eq "bayes")? "yes" : "no";
         run_sys("perl transform.pl $sloveso 1 no $print_as_YESNO > current_results/all_data");
 
