@@ -11,9 +11,9 @@ sub run_sys {
     system($w);
 }
 
-#my $sloveso = $ARGV[0];
-#{
-for my $sloveso qw(ally arrive cry halt plough submit) { 
+my $sloveso = $ARGV[0];
+{
+#for my $sloveso qw(ally arrive cry halt plough submit) { 
     for my $type qw(SVM bayes bagging boosting DT) {
        
         my $print_as_YESNO = ($type eq "bayes")? "yes" : "no";
