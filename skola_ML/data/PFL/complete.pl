@@ -13,11 +13,13 @@ sub run_sys {
 
 #my $sloveso = $ARGV[0];
 #{
-for my $sloveso qw(ally arrive cry halt plough submit) { 
+for my $sloveso qw(submit) { 
+#for my $sloveso qw(ally arrive cry halt plough submit) { 
     TYPE:
-    for my $type qw(SVM bayes bagging boosting DT) {
-            next TYPE if !($sloveso ne "ally" or ($type eq "DT" or $type eq
-            "SVM"));
+    for my $type qw(bagging boosting DT) {
+    #for my $type qw(SVM bayes bagging boosting DT) {
+#            next TYPE if !($sloveso ne "ally" or ($type eq "DT" or $type eq
+ #           "SVM"));
 
         my $print_as_YESNO = ($type eq "bayes")? "yes" : "no";
         run_sys("perl transform.pl $sloveso 1 no $print_as_YESNO > current_results/all_data");
@@ -36,7 +38,7 @@ for my $sloveso qw(ally arrive cry halt plough submit) {
             } else {
                 #grid searching - all except bayes that has no parameters
                 next TUNE_STYLE if ($type eq "bayes");
-                next TYPE if ($sloveso eq "ally");
+  #              next TYPE if ($sloveso eq "ally");
 
 
                 run_sys("R --no-save --args $type < muj_grid_try.R");
