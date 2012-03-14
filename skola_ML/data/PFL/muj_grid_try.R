@@ -1,4 +1,4 @@
-argument <- commandArgs(trailingOnly = TRUE);
+arguments <- commandArgs(trailingOnly = TRUE);
 
 argument <- arguments[1];
 datafile <- arguments[2];
