@@ -2,7 +2,7 @@ library(rpart)
 library(e1071)
 library(adabag)
 
-all_table<-read.table("current_results/all_data")
+all_table<-read.table(datafile)
 
 get_opts_grid <- function(type) {
     if (type=="bagging") {

@@ -1,4 +1,10 @@
 argument <- commandArgs(trailingOnly = TRUE);
+
+argument <- arguments[1];
+datafile <- arguments[2];
+resultfile <- arguments[3];
+optionsfile <- arguments[4];
+
 source("shared.R");
 
 #working_range<- 1:220
@@ -28,6 +34,6 @@ errors <- results[2,];
 
 best<-which.max(means);
 
-write.table(opts_grid[best,], "current_results/best_options");
-write(c(max(means), errors[best]), "current_results/test_result");
+write.table(opts_grid[best,], optionsfile);
+write(c(max(means), errors[best]), resultfile);
 

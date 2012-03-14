@@ -1,4 +1,7 @@
-argument <- commandArgs(trailingOnly = TRUE);
+arguments <- commandArgs(trailingOnly = TRUE);
+argument <- arguments[1];
+datafile <- arguments[2];
+resultfile <- arguments[3];
 source("shared.R");
 
 features_to_take <- scan("current_results/feature_took_final")
@@ -9,4 +12,4 @@ result <- more_tries(
            );
  
 
-write(result, "current_results/test_result")
+write(result, resultfile); 
