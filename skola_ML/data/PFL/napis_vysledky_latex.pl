@@ -14,10 +14,11 @@ for my $result_filename (<results/*.result.*>) {
     if ($word eq $wantword){
         #print $way."\t".$word."\t".$size."\t".$error."\t".($size +
          #   $error)."\t".($size - $error)."\n" 
+        my $low_int= sprintf("%.7f", ($res-1.96*$se));
         
         my ($model, $par) = split (/\./, $way);
-        my $low_int = $size - $error;
-        my $high_int = $size + $error;
+        my $low_int =sprintf("%.7f", ( $size - $error));
+        my $high_int = sprintf("%.7f", ($size + $error));
         $all{ $model."  & ".$par." & ".$size." & $low_int & $high_int ".'\\\\ \hline'} = $size;
   
     }
