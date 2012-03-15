@@ -16,8 +16,8 @@ for my $result_filename (<results/*.result.*>) {
          #   $error)."\t".($size - $error)."\n" 
         
         my ($model, $par) = split (/\./, $way);
-        my $low_int =sprintf("%.7f", ( $size - $error));
-        my $high_int = sprintf("%.7f", ($size + $error));
+        my $low_int =sprintf("%.3f", ( $size - $error));
+        my $high_int = sprintf("%.3f", ($size + $error));
         $all{ $model."  & ".$par." & ".$size." & $low_int & $high_int ".'\\\\ \hline'} = $size;
   
     }
