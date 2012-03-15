@@ -7,16 +7,16 @@ all_table<-read.table(datafile)
 get_opts_grid <- function(type) {
     if (type=="bagging") {
         return (expand.grid( 
-            min_split = c( 2, 10, 50, 100),
-            c_p = c( 0.002,0.01,0.05,0.2),
-            mfinal = c(10,20,50,100,200)            
+            min_split = c( 2, , 50, 100),
+            c_p = c( 0.002,0.05,0.2),
+            mfinal = c(10,50,200)            
         ));
     }
     if (type=="boosting") {
         return (expand.grid( 
-            min_split = c( 10, 50, 100),
-            c_p = c( 0.01,0.05,0.2),
-            mfinal = c(10,50,100,200),            
+            min_split = c( 10,  100),
+            c_p = c( 0.01,0.2),
+            mfinal = c(10,100),            
             boos = c(TRUE, FALSE),
             coeflearn = c("Breiman", "Freund", "Zhu")
         ));

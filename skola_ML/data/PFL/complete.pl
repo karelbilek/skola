@@ -20,8 +20,8 @@ my $options = "current_results/options_$parallel";
 #for my $sloveso qw(submit) { 
 #for my $sloveso qw(ally arrive cry halt plough submit) { 
     TYPE:
-    #for my $type qw(bagging boosting DT) {
-    for my $type qw(SVM bayes bagging boosting DT) {
+    for my $type qw(bagging boosting) {
+    #for my $type qw(SVM bayes bagging boosting DT) {
 #            next TYPE if !($sloveso ne "ally" or ($type eq "DT" or $type eq
  #           "SVM"));
 
@@ -32,7 +32,8 @@ my $options = "current_results/options_$parallel";
         #1 - default tuning (with svm and rpart)
         #2 - my own grid search tuning
         TUNE_STYLE:
-        for my $param_tune_style (0,1,2) {
+        for my $param_tune_style (2) {
+        #for my $param_tune_style (0,1,2) {
             if ($param_tune_style == 0) {                
                 run_sys("R --no-save --args $type $alldataname $resultname < jednoduchy_try.R");
             } elsif ($param_tune_style == 1) {
@@ -50,7 +51,7 @@ my $options = "current_results/options_$parallel";
                 #and, in the end, I just use the found parameters to one final testing
                 #run_sys("R --no-save --args $type < muj_grid_final.R");
                 
-            run_sys ("mv $options results/$type.muj_search.opts.$sloveso");
+                run_sys ("mv $options results/$type.muj_search.opts.$sloveso");
 
             }
 
