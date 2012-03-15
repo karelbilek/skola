@@ -10,5 +10,5 @@ for my $result_filename (<results/*.result.*>) {
     chomp $res;
     my ($size, $error) = $res =~ /^(.*)\s*(.*)$/;
     print $way."\t".$word."\t".$size."\t".$error."\t".($size +
-    $error)."\t".($size - $error))."\n" if ($word eq $wantword);
+    $error)."\t".($size - $error)."\n" if ($word eq $wantword);
 }
