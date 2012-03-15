@@ -7,14 +7,19 @@ my %all;
 for my $result_filename (<results/*.result.*>) {
     my ($way, $word) = $result_filename =~ m{results/(.*)\.result\.(.*)};
     use File::Slurp;
-    my $res = 0+read_file("$result_filename");
+    my $res = read_file("$result_filename");
+    chomp $res;
+    my ($size, $error) = $res =~ /^(\S+)\s+(\S+)$/;
+     
     if ($word eq $wantword){
-        my ($type, $feat, $par) = split (/\./, $way);
-        $feat =~ s/_/ /;
-        my $se=sqrt($res*(1-$res)/30);
-        my $low_int= sprintf("%.7f", ($res-1.96*$se));
-        my $high_int= sprintf("%.7f", ($res+1.96*$se));
-        $all{ $type." & ".$feat." & ".$par." & ".$res." & $low_int & $high_int ".'\\\\ \hline'} = $res;
+        #print $way."\t".$word."\t".$size."\t".$error."\t".($size +
+         #   $error)."\t".($size - $error)."\n" 
+        
+        my $low_int = $size - $error;
+        my $big_int = $size + $error;
+        my ($model, $par) = split (/\./, $way);
+        $all{ $type."  & ".$par." & ".$res." & $low_int & $high_int ".'\\\\ \hline'} = $res;
+  
     }
 }
 
