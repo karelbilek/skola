@@ -7,7 +7,7 @@ all_table<-read.table(datafile)
 get_opts_grid <- function(type) {
     if (type=="bagging") {
         return (expand.grid( 
-            min_split = c( 2, , 50, 100),
+            min_split = c( 2 , 50, 100),
             c_p = c( 0.002,0.05,0.2),
             mfinal = c(10,50,200)            
         ));
