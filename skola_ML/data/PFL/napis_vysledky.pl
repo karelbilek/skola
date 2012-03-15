@@ -9,5 +9,6 @@ for my $result_filename (<results/*.result.*>) {
     my $res = read_file("$result_filename");
     chomp $res;
     my ($size, $error) = $res =~ /^(.*)\s*(.*)$/;
-    print $way."\t".$word."\t".$size."\t".$error."\n" if ($word eq $wantword);
+    print $way."\t".$word."\t".$size."\t".$error."\t".($size +
+    $error)."\t".($size - $error))."\n" if ($word eq $wantword);
 }

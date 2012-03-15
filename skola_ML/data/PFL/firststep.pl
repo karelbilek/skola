@@ -35,18 +35,18 @@ my $options = "current_results/options_$parallel";
         for my $param_tune_style (2) {
         #for my $param_tune_style (0,1,2) {
             if ($param_tune_style == 0) {                
-                run_sys("R --no-save --args $type $alldataname $resultname < jednoduchy_try.R");
+                run_sys("R --no-save --args $type $alldataname $resultname < firststep_0.R");
             } elsif ($param_tune_style == 1) {
                 next TUNE_STYLE if ($type ne "SVM" and $type ne "DT");
 
-                run_sys("R --no-save --args $type $alldataname $resultname < easytune_try.R");
+                run_sys("R --no-save --args $type $alldataname $resultname < firststep_1.R");
             } else {
                 #grid searching - all except bayes that has no parameters
                 next TUNE_STYLE if ($type eq "bayes");
   #              next TYPE if ($sloveso eq "ally");
 
 
-                run_sys("R --no-save --args $type $alldataname $resultname $options < muj_grid_try.R");
+                run_sys("R --no-save --args $type $alldataname $resultname $options < firststep_2.R");
 
                 #and, in the end, I just use the found parameters to one final testing
                 #run_sys("R --no-save --args $type < muj_grid_final.R");
