@@ -8,7 +8,7 @@ for my $result_filename (<results/*.result.*>) {
     use File::Slurp;
     my $res = read_file("$result_filename");
     chomp $res;
-    my ($size, $error) = $res =~ /^(.*)\s*(\S*)$/;
+    my ($size, $error) = $res =~ /^(\S+)\s+(\S+)$/;
     print $way."\t".$word."\t".$size."\t".$error."\t".($size +
     $error)."\t".($size - $error)."\n" if ($word eq $wantword);
 }
