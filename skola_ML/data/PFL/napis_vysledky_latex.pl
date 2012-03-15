@@ -15,10 +15,11 @@ for my $result_filename (<results/*.result.*>) {
         #print $way."\t".$word."\t".$size."\t".$error."\t".($size +
          #   $error)."\t".($size - $error)."\n" 
         
+        my ($model, $par) = split (/\./, $way);
         my $low_int = $size - $error;
         my $big_int = $size + $error;
         my ($model, $par) = split (/\./, $way);
-        $all{ $type."  & ".$par." & ".$res." & $low_int & $high_int ".'\\\\ \hline'} = $res;
+        $all{ $model."  & ".$par." & ".$res." & $low_int & $high_int ".'\\\\ \hline'} = $res;
   
     }
 }
