@@ -644,8 +644,8 @@ sub all_features {
     push(@res, map {sentence_part($_)}(5,10,15));
     push(@res, map {sentence_length($_)}(5,10,15));
 
-    push(@res, map {lemma_at_position($_)}(-1));
-    push(@res, map {POS_at_position($_)}(1));
+#    push(@res, map {lemma_at_position($_)}(-1));
+#    push(@res, map {POS_at_position($_)}(1));
  
     for my $i ((-6..-1), (1..6)) {
             push (@res, POS_around($i));

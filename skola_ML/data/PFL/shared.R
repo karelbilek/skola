@@ -271,7 +271,6 @@ try <- function(train_range, test_range, features, type,tune, boost,
             test_copy = test_table_without_class;
             test_copy[, "semantic_class"] = 
                 factor(levels[0], levels=levels)
-            tune =0;type="bagging";
             if (type == "bagging") {
                 if (tune==0) {
                     classifier<-bagging(formula, train_table);
