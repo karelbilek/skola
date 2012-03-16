@@ -237,8 +237,8 @@ try <- function(train_range, test_range, features, type,tune, boost,
         print("Beru ficuru:");
         print(length(names));
 
-        print(formula);
         formula <- as.formula(paste("semantic_class ~ ", paste(names, collapse= " + ")))
+        print(formula);
         
 #       formula <- as.formula("semantic_class ~ .");
         if (type=="baseline") {
