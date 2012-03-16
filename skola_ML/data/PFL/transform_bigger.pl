@@ -778,7 +778,7 @@ for my $cycle_row (0..$#res) {
     print "\n";
 }
 
-my $count = $#head - scalar keys %not_printing - 1;
+my $count = -1 + $#head - scalar keys %not_printing ;
 use File::Slurp;
 write_file("current_results/feature_count", $count);
 
