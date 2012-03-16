@@ -740,6 +740,7 @@ for my $column (2..$#head) {
     } 
 }
 
+
 for my $column (0..$#head) {
     if (!exists $not_printing{$column}){
         my $r = $head[$column];
@@ -778,6 +779,7 @@ for my $cycle_row (0..$#res) {
 }
 
 my $count = $#head - scalar keys %not_printing;
+print "V TRANSFORMU JE COUNT $count\n";
 use File::Slurp;
 write_file("current_results/feature_count", $count);
 

@@ -231,7 +231,11 @@ try <- function(train_range, test_range, features, type,tune, boost,
         correct_classes <- all_table[test_range, 1]
         train_table <- all_table[train_range,]
         
-        
+        print("names jsou velke");
+        print(length(names(test_table_without_class));
+        print("Feats jsou velke");
+        print(features);
+
         names <- names(test_table_without_class)[features==1]
 #DEGEN
         print("Beru ficuru:");
@@ -240,6 +244,8 @@ try <- function(train_range, test_range, features, type,tune, boost,
         formula <- as.formula(paste("semantic_class ~ ", paste(names, collapse= " + ")))
         print(formula);
         
+
+
 #       formula <- as.formula("semantic_class ~ .");
         if (type=="baseline") {
        
