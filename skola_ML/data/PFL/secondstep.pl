@@ -110,5 +110,5 @@ for my $i (0..0) {
     }
 }
 
-say "Posledni stav je $new_state.";
+say "Posledni stav je $current_state.";
 write_out(\@features, "results/feats_$word");
