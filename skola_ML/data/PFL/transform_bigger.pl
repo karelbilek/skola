@@ -779,7 +779,7 @@ for my $cycle_row (0..$#res) {
 }
 
 my $count = $#head - scalar keys %not_printing;
-print "V TRANSFORMU JE COUNT $count\n";
+warn "V TRANSFORMU JE COUNT $count\n";
 use File::Slurp;
 write_file("current_results/feature_count", $count);
 
