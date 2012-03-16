@@ -8,6 +8,9 @@ my %settings_for_word = (
     ally=>{type=>'2', model=> 'SVM', options => 
     '"scale" "kernel" "degree" "gamma" "coef0" "cost" "shrinking" "probability"
     "1379" TRUE "polynomial" 2 0.1 1 1 TRUE TRUE'},
+    arrive=>{type=>'2', model=>'boosting', options=>
+'"min_split" "c_p" "mfinal" "boos" "coeflearn"
+"5" 10 0.01 100 TRUE "Breiman"'},
 );
 
 sub run_sys {
@@ -81,6 +84,9 @@ sub do_experiment {
     $did{$to_write}=0+$line;
     return 0+$line;
 }
+
+say do_experiment([(1)x$count]);
+die ":)";
 
 say "Zacatek";
 my $current_state = do_experiment(\@features);

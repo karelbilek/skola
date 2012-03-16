@@ -78,12 +78,15 @@ custom_classifier <- function(type, formula, train_data, opts) {
             cp = as.numeric(opts["c_p"]),
             minsplit = as.numeric(opts["min_split"])
         )
+        print("DEGENE");
+        print(opts["coeflearn"]);
         classifier<-boosting(
             formula,
             data = train_data, 
             mfinal = as.numeric(opts["mfinal"]),
             boos = my_as_logical(opts["boos"]),
-            coeflearn = opts["coeflearn"]);
+            coeflearn = "Breiman");#opts["coeflearn"]);
+        print ("WHAT THE FUCK DO YOU WANT");
     }
 
 
@@ -233,8 +236,7 @@ try <- function(train_range, test_range, features, type,tune, boost,
        
         names <- names(test_table_without_class)[features==1]
         formula <- as.formula(paste("semantic_class ~ ", paste(names, collapse= " + ")))
-        
-        
+        print(custom_options);        
 
 
 #       formula <- as.formula("semantic_class ~ .");
@@ -262,7 +264,6 @@ try <- function(train_range, test_range, features, type,tune, boost,
         if (type=="bagging" | type=="boosting") {
            #this is absolutely weird, but R is weird, I can't help it
            #first, I make train_table into factor
-
             train_table[, "semantic_class"] =
                    factor(train_table[,"semantic_class"]);
             levels = levels(train_table[, "semantic_class"])
@@ -270,7 +271,6 @@ try <- function(train_range, test_range, features, type,tune, boost,
             test_copy = test_table_without_class;
             test_copy[, "semantic_class"] = 
                 factor(levels[0], levels=levels)
-
             if (type == "bagging") {
                 if (tune==0) {
                     classifier<-bagging(formula, train_table);
