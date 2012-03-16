@@ -63,13 +63,18 @@ sub do_experiment {
     $pokusy++;
     my $to_write = write_out($array, "current_results/feature_took");
     if (exists $did{$to_write}) {return $did{$to_write}}
+    
+    system("rm current_results/experiment_output");
     system ( "R --no-save --args ".
             $model." ".
             $stype.
             " current_results/all_data current_results/options".
             " current_results/experiment_output".
             " current_results/feature_took < secondstep.R");
-
+    
+    if (!-e "current_results/experiment_output") {
+        die "DEATH TO AMERICA";
+    }
     open my $inf, "<", "current_results/experiment_output";
     my $line = <$inf>;
     close $inf;
