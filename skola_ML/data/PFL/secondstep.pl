@@ -12,9 +12,9 @@ sub run_sys {
     system($w);
 }
 
-my %settings = {type=>'2', model=> 'SVM', options => 
+my %settings = (type=>'2', model=> 'SVM', options => 
     '"scale" "kernel" "degree" "gamma" "coef0" "cost" "shrinking" "probability"
-    "1379" TRUE "polynomial" 2 0.1 1 1 TRUE TRUE'};
+    "1379" TRUE "polynomial" 2 0.1 1 1 TRUE TRUE');
 
 use File::Slurp;
 
