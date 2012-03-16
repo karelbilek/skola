@@ -234,7 +234,6 @@ try <- function(train_range, test_range, features, type,tune, boost,
         names <- names(test_table_without_class)[features==1]
         formula <- as.formula(paste("semantic_class ~ ", paste(names, collapse= " + ")))
         
-        print(formula);
         
 
 
