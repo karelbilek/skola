@@ -78,10 +78,10 @@ sub do_experiment {
 
 say "Zacatek";
 
-my $step = (scalar (@features)-1) / 50;
+my $step = (scalar (@features)-1) / 100;
 
 my $current_state = do_experiment(\@features);
-for my $i (0..50) {
+for my $i (0..100) {
     my @copied_features = @features;
     for my $j ($i*$step.. ($i+1)*$step) {
         $copied_features[$j]=1 if ($j>0 and $j < scalar @features);
@@ -96,12 +96,12 @@ for my $i (0..50) {
         say "na $i 1 nic nezlepsi";
     }
 }
-for my $i (0..0) {
+for my $i (0..$#features) {
     my @copied_features = @features;
     $copied_features[$i] = 1 - $features[$i];
 
     my $new_state = do_experiment(\@copied_features);
-    if ($new_state >= $current_state) {
+    if ($new_state > $current_state) {
         say "na $i je 1 zlepseni, new state je $new_state";
         $current_state = $new_state;
         @features = @copied_features;
