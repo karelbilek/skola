@@ -103,7 +103,7 @@ for my $i (0..400) {
     use List::Util qw(shuffle);
 
     my @random_shuffle = shuffle (0..$#features);
-    my @random_set = $random_shuffle[0..$random_nu]; 
+    my @random_set = @random_shuffle[0..$random_nu]; 
 
     my @copied_features = @features;
     for my $j (@random_set) {
