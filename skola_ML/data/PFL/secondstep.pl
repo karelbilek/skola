@@ -3,12 +3,12 @@ use warnings;
 use strict;
 
 my $word = $ARGV[0];
-
+#bacha obracene
 my %settings_for_word = (
-    ally=>{type=>'2', model=> 'SVM', options => 
+    arrive=>{type=>'2', model=> 'SVM', options => 
     '"scale" "kernel" "degree" "gamma" "coef0" "cost" "shrinking" "probability"
     "1379" TRUE "polynomial" 2 0.1 1 1 TRUE TRUE'},
-    arrive=>{type=>'2', model=>'SVM', options=>
+    ally=>{type=>'2', model=>'SVM', options=>
 '"scale" "kernel" "degree" "gamma" "coef0" "cost" "shrinking" "probability"
 "699" TRUE "polynomial" 1 0.5 0 0.5 TRUE TRUE'},
 );
