@@ -230,18 +230,10 @@ try <- function(train_range, test_range, features, type,tune, boost,
         test_table_without_class <- all_table[test_range, -1]
         correct_classes <- all_table[test_range, 1]
         train_table <- all_table[train_range,]
-        
-        print("names jsou velke");
-        print(length(names(test_table_without_class)));
-        print("Feats jsou velke");
-        print(length(features));
-
+       
         names <- names(test_table_without_class)[features==1]
-#DEGEN
-        print("Beru ficuru:");
-        print(length(names));
-
         formula <- as.formula(paste("semantic_class ~ ", paste(names, collapse= " + ")))
+        
         print(formula);
         
 
