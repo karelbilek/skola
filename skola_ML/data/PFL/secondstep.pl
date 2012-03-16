@@ -82,7 +82,6 @@ my $step = (scalar (@features)-1) / 70;
 
 my $current_state = do_experiment(\@features);
 for my $i (0..70) {
-    last;
     my @copied_features = @features;
     for my $j ($i*$step.. ($i+1)*$step) {
         $copied_features[$j]=1 if ($j>0 and $j < scalar @features);
@@ -90,11 +89,11 @@ for my $i (0..70) {
 
     my $new_state = do_experiment(\@copied_features);
     if ($new_state >= $current_state) {
-        say "na $i je 1 zlepseni, new state je $new_state";
+        say "na $i je  zlepseni, new state je $new_state";
         $current_state = $new_state;
         @features = @copied_features;
     } else {
-        say "na $i 1 nic nezlepsi";
+        say "na $i  nic nezlepsi";
     }
 }
 for my $i (0..400) {
@@ -104,18 +103,18 @@ for my $i (0..400) {
 
     my @random_shuffle = shuffle (0..$#features);
     my @random_set = @random_shuffle[0..$random_nu]; 
-
+    
     my @copied_features = @features;
     for my $j (@random_set) {
-        $copied_features[$j]= -$features[$j];
+        $copied_features[$j] = 1 - ($features[$j]);
     }
     my $new_state = do_experiment(\@copied_features);
     if ($new_state > $current_state) {
-        say "random pokus $i je 1 zlepseni, new state je $new_state";
+        say "random pokus $i je  zlepseni, new state je $new_state";
         $current_state = $new_state;
         @features = @copied_features;
     } else {
-        say "random pokus $i 1 nic nezlepsi";
+        say "random pokus $i  nic nezlepsi";
     }
 }
 
