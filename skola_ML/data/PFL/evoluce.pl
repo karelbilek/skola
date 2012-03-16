@@ -7,7 +7,6 @@ use AI::Genetic;
 my $model = $ARGV[0];
 my $stype = $ARGV[1];
 
-my $degen=0;
 
 my $counter_sames;
 my $last_gen=0;
@@ -16,7 +15,7 @@ my $ga = new AI::Genetic(
     -type       => 'bitvector',
     -population => 10,
     -crossover  => 0.9,
-    -mutation   => 0.3,
+    -mutation   => 0.2,
     -terminate  => sub {
         my $sc = $_[0]->getFittest->score;
         if ($last_gen==$sc) {
