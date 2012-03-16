@@ -5,7 +5,7 @@ use Readonly;
 
 Readonly my $sloveso => $ARGV[0];
 Readonly my $treshold => $ARGV[1];
-Readonly my $should_print_features_out => ($ARGV[2] eq "yes");
+Readonly my $paral => $ARGV[2];
 Readonly my $binary_as_YESNO => (($ARGV[3] || "") eq "yes");
 
 Readonly my @row_poradi => qw(143 146 213 135 22 106 74 100 192 120 169 195 2
@@ -780,8 +780,5 @@ for my $cycle_row (0..$#res) {
 
 my $count = -1 + $#head - scalar keys %not_printing ;
 use File::Slurp;
-write_file("current_results/feature_count", $count);
+write_file("current_results/feature_count_$paral", $count);
 
-if ($should_print_features_out) {
-   write_file("current_results/feature_took_final", "1 "x$count); 
-}

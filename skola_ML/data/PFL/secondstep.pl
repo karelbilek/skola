@@ -1,17 +1,10 @@
-    use 5.010;
+use 5.010;
 use warnings;
 use strict;
 
 my $word = $ARGV[0];
-#bacha obracene
-my %settings_for_word = (
-    arrive=>{type=>'2', model=> 'SVM', options => 
-    '"scale" "kernel" "degree" "gamma" "coef0" "cost" "shrinking" "probability"
-    "1379" TRUE "polynomial" 2 0.1 1 1 TRUE TRUE'},
-    ally=>{type=>'2', model=>'SVM', options=>
-'"scale" "kernel" "degree" "gamma" "coef0" "cost" "shrinking" "probability"
-"699" TRUE "polynomial" 1 0.5 0 0.5 TRUE TRUE'},
-);
+
+my $paral = $ARGV[1];
 
 sub run_sys {
     my $w = shift;
@@ -19,22 +12,20 @@ sub run_sys {
     system($w);
 }
 
-
-my %settings = %{$settings_for_word{$word}};
-
-use File::Slurp;
-
-write_file("current_results/options", $settings{options}."\n");
-
-
-run_sys("perl transform_bigger.pl $word 1 yes no > current_results/all_data");
-#JOrun_sys("perl evoluce.pl ".$settings{model}." ".$settings{type});
-
-#JOrun_sys("mv current_results/evolution_feature_took_final ".
-#JO    "results/evolution.$word.features");
+my %settings = {type=>'2', model=> 'SVM', options => 
+    '"scale" "kernel" "degree" "gamma" "coef0" "cost" "shrinking" "probability"
+    "1379" TRUE "polynomial" 2 0.1 1 1 TRUE TRUE'};
 
 use File::Slurp;
-my $count = read_file("current_results/feature_count");
+
+write_file("current_results/options_$paral", $settings{options}."\n");
+
+
+run_sys("perl transform_bigger.pl $word 1 $paral no >".
+    " current_results/all_data_$paral");
+
+use File::Slurp;
+my $count = read_file("current_results/feature_count_$paral");
 
 my @features = (1);
 push @features, (0)x($count - 1);
@@ -62,21 +53,21 @@ sub write_out {
 
 sub do_experiment {
     my $array = shift;
-    my $to_write = write_out($array, "current_results/feature_took");
+    my $to_write = write_out($array, "current_results/feature_took_$paral");
     if (exists $did{$to_write}) {return $did{$to_write}}
     
-    system("rm current_results/experiment_output");
+    system("rm current_results/experiment_output_$paral");
     system ( "R --no-save --args ".
             $settings{model}." ".
             $settings{type}.
-            " current_results/all_data current_results/options".
-            " current_results/experiment_output".
-            " current_results/feature_took < secondstep.R");
+            " current_results/all_data_$paral current_results/options_$paral".
+            " current_results/experiment_output_$paral".
+            " current_results/feature_took_$paral < secondstep.R");
     
-    if (!-e "current_results/experiment_output") {
+    if (!-e "current_results/experiment_output_$paral") {
         die "DEATH TO AMERICA";
     }
-    open my $inf, "<", "current_results/experiment_output";
+    open my $inf, "<", "current_results/experiment_output_$paral";
     my $line = <$inf>;
     close $inf;
     chomp $line;
@@ -105,8 +96,19 @@ for my $i (0..50) {
         say "na $i 1 nic nezlepsi";
     }
 }
+for my $i (0..0) {
+    my @copied_features = @features;
+    $copied_features[$i] = 1 - $features[$i];
 
-#run_sys( "R --no-save --args ".
-#            $settings{model}." ".
-#            $settings{type}.
-#            " current_results/all_data current_results/options resfile featuresfile < secondstep.R");
+    my $new_state = do_experiment(\@copied_features);
+    if ($new_state >= $current_state) {
+        say "na $i je 1 zlepseni, new state je $new_state";
+        $current_state = $new_state;
+        @features = @copied_features;
+    } else {
+        say "na $i 1 nic nezlepsi";
+    }
+}
+
+say "Posledni stav je $new_state.";
+write_out(\@features, "results/feats_$word");

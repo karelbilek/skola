@@ -49,9 +49,6 @@ sub write_out {
         }
     }
 
-    print "V EVOLUCI JE WRITE OUT VELKY ";
-    print scalar @$what;
-    print "\n";
     open my $outf, ">", $where;
     print $outf $to_write."\n";
     close $outf;
