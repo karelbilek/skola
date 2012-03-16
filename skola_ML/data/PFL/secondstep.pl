@@ -85,24 +85,25 @@ sub do_experiment {
     return 0+$line;
 }
 
-say do_experiment([(1)x$count]);
-die ":)";
-
 say "Zacatek";
+
+my $step = (scalar (@features)-1) / 50;
+
 my $current_state = do_experiment(\@features);
-for my $i (1..50) {
+for my $i (0..50) {
     my @copied_features = @features;
-    $copied_features[$i] = 1;
+    for my $j ($i*$step.. ($i+1)*$step) {
+        $copied_features[$j]=1 if ($j>0 and $j < scalar @features);
+    }
+
     my $new_state = do_experiment(\@copied_features);
     if ($new_state >= $current_state) {
         say "na $i je 1 zlepseni, new state je $new_state";
         $current_state = $new_state;
         @features = @copied_features;
     } else {
-        
         say "na $i 1 nic nezlepsi";
     }
-
 }
 
 #run_sys( "R --no-save --args ".
