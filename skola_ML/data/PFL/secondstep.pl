@@ -82,6 +82,7 @@ my $step = (scalar (@features)-1) / 70;
 
 my $current_state = do_experiment(\@features);
 for my $i (0..70) {
+    last;
     my @copied_features = @features;
     for my $j ($i*$step.. ($i+1)*$step) {
         $copied_features[$j]=1 if ($j>0 and $j < scalar @features);
