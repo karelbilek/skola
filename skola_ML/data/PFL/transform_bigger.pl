@@ -745,6 +745,14 @@ for my $column (0..$#head) {
         my $r = $head[$column];
         $r=~s/-/m/g;
         $r=~s/'/ap/g;
+        $r=~s/,/carka/g;
+        $r=~s/\$/dolr/g;
+        $r=~s/:/dtecka/g;
+        $r=~s/\./tecka/g;
+        $r=~s/\?/otaz/g;
+        $r=~s/\(/zavl/g;
+        $r=~s/;/stred/g;
+        $r=~s/\)/zavp/g;
         $r=~s/`/zpap/g;
         print $r."\t";
     }
