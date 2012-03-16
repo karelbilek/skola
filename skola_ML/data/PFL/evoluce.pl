@@ -14,12 +14,10 @@ my $last_gen=0;
 my $ga = new AI::Genetic(
     -fitness    =>  \&do_experiment ,
     -type       => 'bitvector',
-    -population => 70,
+    -population => 10,
     -crossover  => 0.9,
-    -mutation   => 0.5,
+    -mutation   => 0.3,
     -terminate  => sub {
-        $degen++;
-        if ($degen==4) {return 1;}
         my $sc = $_[0]->getFittest->score;
         if ($last_gen==$sc) {
             $counter_sames++;
