@@ -232,9 +232,9 @@ try <- function(train_range, test_range, features, type,tune, boost,
         train_table <- all_table[train_range,]
         
         print("names jsou velke");
-        print(length(names(test_table_without_class));
+        print(length(names(test_table_without_class)));
         print("Feats jsou velke");
-        print(features);
+        print(length(features));
 
         names <- names(test_table_without_class)[features==1]
 #DEGEN
