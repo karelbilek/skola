@@ -24,7 +24,10 @@ write_file("current_results/options", $settings{options}."\n");
 
 
 run_sys("perl transform_bigger.pl $word 1 yes no > current_results/all_data");
-run_sys( "R --no-save --args ".
-            $settings{model}." ".
-            $settings{type}.
-            " current_results/all_data current_results/options < secondstep.R");
+run_sys("perl evoluce.pl ".$settings{model}." ".$settings{type});
+
+
+#run_sys( "R --no-save --args ".
+#            $settings{model}." ".
+#            $settings{type}.
+#            " current_results/all_data current_results/options resfile featuresfile < secondstep.R");

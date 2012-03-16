@@ -3,10 +3,12 @@ model <- arguments[1];
 type <- arguments[2];
 datafile <- arguments[3];
 optionsfile <- arguments[4];
+resultfile <- arguments[5];
+featurefile <- arguments[6];
 
 source("shared.R");
 
-features_to_take <- scan("current_results/feature_took_final")
+features_to_take <- scan(featurefile)
 
 if (type == 0) {
 
@@ -22,5 +24,5 @@ if (type == 0) {
 
 }
 
-print(result);
-# write(result, resultfile)
+#print(result);
+write(result[1], resultfile)

@@ -232,9 +232,13 @@ try <- function(train_range, test_range, features, type,tune, boost,
         train_table <- all_table[train_range,]
         names <- names(test_table_without_class)[features==1]
         
+        print("Beru ficur:");
+        print(length(names));
+
+
         formula <- as.formula(paste("semantic_class ~ ", paste(names, collapse= "+")))
       
-        formula <- as.formula("semantic_class ~ .");
+#       formula <- as.formula("semantic_class ~ .");
         if (type=="baseline") {
        
             most_freq <- which.max(table(train_table[,1]))
