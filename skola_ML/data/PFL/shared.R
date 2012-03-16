@@ -230,11 +230,25 @@ try <- function(train_range, test_range, features, type,tune, boost,
         test_table_without_class <- all_table[test_range, -1]
         correct_classes <- all_table[test_range, 1]
         train_table <- all_table[train_range,]
-        names <- names(test_table_without_class)[features==1]
+        names <- names(test_table_without_class)
         
-        print("Beru ficur:");
-        print(length(names));
+        
+        for (ficura in names) {
+    print("Zkousim ficuru ");
+    print(ficura);
 
+            formula <- as.formula(paste("semantic_class ~", ficura));
+            classifier<-rpart(
+                    formula, 
+                    data = train_table[2,], 
+                    method = "class");
+
+
+        }
+        #names <- names(test_table_without_class)[features==1]
+#DEGEN
+        print("Beru ficuru:");
+        print(length(names));
 
         formula <- as.formula(paste("semantic_class ~ ", paste(names, collapse= " + ")))
         
