@@ -40,6 +40,6 @@ if (!-e "current_results/experiment_output_$paral") {
 
 my $res = read_file("current_results/experiment_output_$paral");
 run_sys("mv current_results/experiment_output_$paral".
-        " results/final_output_$paral");
+        " results/final_output_$word");
 
 say $res;
