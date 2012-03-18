@@ -20,6 +20,7 @@ if (type == 0) {
 
     result <- try(
                 train_range, test_range
+                ,
                 features_to_take,
            model, 0,0
            );
