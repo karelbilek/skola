@@ -78,15 +78,12 @@ custom_classifier <- function(type, formula, train_data, opts) {
             cp = as.numeric(opts["c_p"]),
             minsplit = as.numeric(opts["min_split"])
         )
-        print("DEGENE");
-        print(opts["coeflearn"]);
         classifier<-boosting(
             formula,
             data = train_data, 
             mfinal = as.numeric(opts["mfinal"]),
             boos = my_as_logical(opts["boos"]),
             coeflearn = "Breiman");#opts["coeflearn"]);
-        print ("WHAT THE FUCK DO YOU WANT");
     }
 
 
@@ -206,7 +203,7 @@ more_tries <- function(features_to_take, type, tune, boost, opts) {
 #pomohl jsem si http://www.cyclismo.org/tutorial/R/confidence.html#t
    
    for (cross_validation_number in (0:9)) {
-        print(cross_validation_number);
+       print(cross_validation_number);
         starting_line<-cross_validation_number*25+1;
         ending_line<-starting_line+24;
         
@@ -236,7 +233,6 @@ try <- function(train_range, test_range, features, type,tune, boost,
        
         names <- names(test_table_without_class)[features==1]
         formula <- as.formula(paste("semantic_class ~ ", paste(names, collapse= " + ")))
-        print(custom_options);        
 
         do_predict <- (test_range[1] != -1)
 #       formula <- as.formula("semantic_class ~ .");
