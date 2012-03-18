@@ -355,7 +355,7 @@ try <- function(train_range, test_range, features, type,tune, boost,
             correctness<- length(same[same])
             return(correctness/length(test_range))
         } else {
-            return classifier;
+            return(classifier);
         }
 }
 
