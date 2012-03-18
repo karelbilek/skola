@@ -239,6 +239,7 @@ try <- function(train_range, test_range, features, type,tune, boost,
         print(custom_options);        
 
         do_predict <- (test_range[1] == -1)
+        print(paste("do predict je", do_predict))
 #       formula <- as.formula("semantic_class ~ .");
         if (type=="baseline") {
        
@@ -355,6 +356,7 @@ try <- function(train_range, test_range, features, type,tune, boost,
             correctness<- length(same[same])
             return(correctness/length(test_range))
         } else {
+            print("JO");
             return(classifier);
         }
 }
