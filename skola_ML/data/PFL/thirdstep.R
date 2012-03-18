@@ -33,5 +33,6 @@ if (type == 0) {
 
 }
 
-#print(result);
+print(modelfile);
 save(result, file=modelfile)
+print(result);
