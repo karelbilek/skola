@@ -10,7 +10,7 @@ source("shared.R");
 
 features_to_take <- scan(featurefile)
 
-train_range = c(0..250);
+train_range = c(1:250);
 test_range = c(-1,-1);
 
 
