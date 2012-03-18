@@ -27,7 +27,7 @@ my $features = "results/itero_feats_$sloveso";
 
         my $print_as_YESNO = ($type eq "bayes")? "yes" : "no";
         run_sys("perl transform_bigger.pl $sloveso 1 $parallel $print_as_YESNO >".
-                 ." $alldataname");
+                 " $alldataname");
 
         #0 - no tuning, simply try the default parameters
         #1 - default tuning (with svm and rpart)
