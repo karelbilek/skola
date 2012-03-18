@@ -37,7 +37,7 @@ my %settings_for_word = (ally=>{type=>'2', model=> 'SVM', options =>
     "8" 50 0.2 10'},
 
 
-    });
+    );
 my %settings = %{$settings_for_word{$word}};
 
 use File::Slurp;
