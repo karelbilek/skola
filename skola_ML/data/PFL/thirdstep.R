@@ -33,4 +33,5 @@ if (type == 0) {
 
 }
 
-save( list=c("result"), file=modelfile)
+print(result);
+save(result, file=modelfile)
