@@ -3,28 +3,34 @@ model <- arguments[1];
 type <- arguments[2];
 datafile <- arguments[3];
 optionsfile <- arguments[4];
-resultfile <- arguments[5];
-featurefile <- arguments[6];
-modelfile <- arguments[7]
+featurefile <- arguments[5];
+modelfile <- arguments[6]
 
 source("shared.R");
 
 features_to_take <- scan(featurefile)
 
+train_range = c(0..250);
+test_range = c(-1,-1);
+
+
 if (type == 0) {
 
-    result <- more_tries(
+    
+
+    result <- try(
+                train_range, test_range
                 features_to_take,
            model, 0,0
            );
 } else {
     opts<-read.table( optionsfile);   
-    result <- more_tries(
+    result <- try(
+                train_range, test_range,
                 features_to_take,
            model, 2,0, opts);
 
 }
 
 #print(result);
-write(result, resultfile);
 save(result, file=modelfile)

@@ -238,7 +238,7 @@ try <- function(train_range, test_range, features, type,tune, boost,
         formula <- as.formula(paste("semantic_class ~ ", paste(names, collapse= " + ")))
         print(custom_options);        
 
-
+        do_predict <- (test_range[1] == -1)
 #       formula <- as.formula("semantic_class ~ .");
         if (type=="baseline") {
        
@@ -257,8 +257,11 @@ try <- function(train_range, test_range, features, type,tune, boost,
                 factor(levels[0], levels=levels)
 
             classifier <- naiveBayes(train_table[,-1], train_table[,1]);
-            found_classes <- predict(classifier, test_copy,
+            
+            if (do_predict) {
+                found_classes <- predict(classifier, test_copy,
                             type="class");
+            }
         }
 
         if (type=="bagging" | type=="boosting") {
@@ -281,9 +284,10 @@ try <- function(train_range, test_range, features, type,tune, boost,
                 }
             
 
-
-                found_classes <- predict.bagging(classifier,
+                if (do_predict) {
+                    found_classes <- predict.bagging(classifier,
                                     newdata = test_copy);
+                }
             } else {
                 if (tune==0) {
                     classifier<-boosting(formula, train_table);
@@ -294,10 +298,10 @@ try <- function(train_range, test_range, features, type,tune, boost,
                 }
             
 
-
-                found_classes <- predict.boosting(classifier,
+                if (do_predict) {
+                    found_classes <- predict.boosting(classifier,
                                     newdata = test_copy);
-                 
+                 }
  
             }
             found_classes <- found_classes$class;
@@ -318,7 +322,9 @@ try <- function(train_range, test_range, features, type,tune, boost,
                 classifier <- custom_classifier("DT", formula, train_table,
                                                     custom_options);
             }
-            found_classes <- predict(classifier, test_table_without_class, type = "class")
+            if (do_predict){
+                found_classes <- predict(classifier, test_table_without_class, type = "class")
+            }
         }
         if (type=="SVM") {
             if (tune==0) {
@@ -339,14 +345,18 @@ try <- function(train_range, test_range, features, type,tune, boost,
                 classifier <- custom_classifier("SVM", formula, train_table,
                                                     custom_options);
             }
-            found_classes <- predict(classifier, test_table_without_class)
-
+            if (do_predict){
+                found_classes <- predict(classifier, test_table_without_class)
+            }
         }
        
-
-        same <- found_classes == correct_classes
-        correctness<- length(same[same])
-        return(correctness/length(test_range))
+        if (do_predict) {
+            same <- found_classes == correct_classes
+            correctness<- length(same[same])
+            return(correctness/length(test_range))
+        } else {
+            return classifier;
+        }
 }
 
 
