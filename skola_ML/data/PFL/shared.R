@@ -304,9 +304,11 @@ try <- function(train_range, test_range, features, type,tune, boost,
                  }
  
             }
-            found_classes <- found_classes$class;
+            if(do_predict){
+               found_classes <- found_classes$class;
+            }
         }
-
+        
         if (type=="DT") {
             if (tune==0) {
                classifier<-rpart(
