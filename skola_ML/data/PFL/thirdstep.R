@@ -14,24 +14,15 @@ train_range = c(1:250);
 test_range = c(-1,-1);
 
 
-if (type == 0) {
+   opts<-read.table( optionsfile);  
+   final <- more_tries( features_to_take,
+           model, 2,0, opts);
 
-    
-
-    result <- try(
-                train_range, test_range
-                ,
-                features_to_take,
-           model, 0,0
-           );
-} else {
-    opts<-read.table( optionsfile);   
     result <- try(
                 train_range, test_range,
                 features_to_take,
            model, 2,0, opts);
 
-}
 
 print(result);
 save(result, file=modelfile)
