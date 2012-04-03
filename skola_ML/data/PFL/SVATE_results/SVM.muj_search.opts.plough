@@ -1,0 +1,2 @@
+"scale" "kernel" "degree" "gamma" "coef0" "cost" "shrinking" "probability"
+"324" FALSE "polynomial" 2 0.2 5 0.1 TRUE TRUE
