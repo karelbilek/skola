@@ -1,2 +1,2 @@
 "should_prune" "splitting_type" "min_split" "c_p"
-"6" 0.02 "gini" 1 0.001
+"15" 0.01 "information" 1 0.001

@@ -1,2 +1,2 @@
-"min_split" "c_p" "mfinal" "boos" "coeflearn"
-"88" 10 0.2 50 TRUE "Freund"
+"scale" "kernel" "degree" "gamma" "coef0" "cost" "shrinking" "probability"
+"1380" FALSE "polynomial" 2 0.1 1 1 TRUE TRUE

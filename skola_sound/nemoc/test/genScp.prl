@@ -1,9 +1,0 @@
-#!/usr/bin/perl
-$j=1;
-$n=40;
-while ($j<=$n)
-{
- print "vety/T$j.mfc\n"; 
- #print "vety/T$j.wav  vety/T$j.mfc\n"; 
- $j=$j+1;
-}

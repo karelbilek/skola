@@ -1,2 +1,2 @@
-"min_split" "c_p" "mfinal" "boos" "coeflearn"
-"31" 10 0.05 200 TRUE "Breiman"
+"scale" "kernel" "degree" "gamma" "coef0" "cost" "shrinking" "probability"
+"1379" TRUE "polynomial" 2 0.1 1 1 TRUE TRUE

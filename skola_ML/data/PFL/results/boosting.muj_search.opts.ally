@@ -1,2 +1,2 @@
 "min_split" "c_p" "mfinal" "boos" "coeflearn"
-"31" 10 0.05 200 TRUE "Breiman"
+"21" 10 0.01 100 TRUE "Freund"

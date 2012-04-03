@@ -1,9 +1,0 @@
-#!/usr/bin/perl
-$j=1;
-$n=142;
-while ($j<=$n)
-{
- print "S$j.mfc\n"; 
- #print "S$j.wav  S$j.mfc\n"; 
- $j=$j+1;
-}
